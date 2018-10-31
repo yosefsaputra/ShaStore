@@ -14,8 +14,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".frontend.MainActivity">
-        </activity>
+        <activity android:name=".frontend.MainActivity" />
         <activity
             android:name=".frontend.LoginActivity"
             android:label="@string/title_activity_login">
@@ -25,6 +24,10 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".frontend.RegistrationCameraActivity" />
+        <activity android:name=".frontend.RegistrationConfirmationActivity" />
+        <activity android:name=".frontend.QRCodeActivity" />
+        <activity android:name=".frontend.RegisteredDevicesActivity"></activity>
     </application>
 
 </manifest>
