@@ -33,4 +33,10 @@
     <string name="permission_rationale">"Contacts permissions are needed for providing email
         completions."
     </string>
+    <string name="registered_devices">Registered Devices</string>
+    <string name="unregister">Unregister</string>
+    <string name="confirm_registration">Confirm Registration</string>
+    <string name="device_unique_id">Device Unique ID</string>
+    <string name="confirm">Confirm</string>
+    <string name="back">Back</string>
 </resources>
