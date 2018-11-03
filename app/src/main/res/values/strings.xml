@@ -39,4 +39,7 @@
     <string name="device_unique_id">Device Unique ID</string>
     <string name="confirm">Confirm</string>
     <string name="back">Back</string>
+    <string name="capture_button">Capture</string>
+    <string name="scan_qr_code">Scan QR Code</string>
+    <string name="low_storage_error">Face detector dependencies cannot be downloaded due to low device storage</string>
 </resources>

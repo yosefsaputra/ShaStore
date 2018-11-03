@@ -20,16 +20,24 @@
 
 package com.example.yosef.shastore.frontend;
 
-import android.support.v7.app.AppCompatActivity;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
+import android.widget.TextView;
 
 import com.example.yosef.shastore.R;
 
 public class RegistrationConfirmationActivity extends AppCompatActivity {
+    public static String QR_CODE_DATA = "QR_CODE_DATA";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration_confirmation);
+
+        Intent referredIntent = getIntent();
+
+        TextView deviceUniqueIdTextView = findViewById(R.id.device_unique_id);
+        deviceUniqueIdTextView.setText(referredIntent.getCharSequenceExtra(QR_CODE_DATA));
     }
 }
