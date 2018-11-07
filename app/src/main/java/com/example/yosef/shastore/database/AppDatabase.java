@@ -24,6 +24,9 @@ import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 
+import com.example.yosef.shastore.database.converters.ProfileConverter;
+import com.example.yosef.shastore.model.components.Profile;
+
 public abstract class AppDatabase extends RoomDatabase {
     private static AppDatabase INSTANCE;
 
@@ -51,4 +54,8 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract ProfileDbDao profileDbDao();
 
     public abstract DeviceDbDao deviceDbDao();
+
+    public Profile getProfile(String username) {
+        return ProfileConverter.toProfile(profileDbDao().getProfileDb(username));
+    }
 }
