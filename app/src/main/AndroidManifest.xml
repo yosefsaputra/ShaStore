@@ -48,14 +48,10 @@
                 <!--<category android:name="android.intent.category.LAUNCHER" />-->
             <!--</intent-filter>-->
         </activity>
-        <activity android:name=".frontend.RegistrationCameraActivity" />
+        <activity android:name=".frontend.QRCodeGeneratorActivity" />
         <activity android:name=".frontend.RegistrationConfirmationActivity" />
-        <activity android:name=".frontend.QRCodeActivity" />
+        <activity android:name=".frontend.RegistrationCameraActivity" />
         <activity android:name=".frontend.RegisteredDevicesActivity" />
-        <activity
-            android:name=".frontend.FileSelector"
-            android:label="@string/title_activity_file_selector"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
