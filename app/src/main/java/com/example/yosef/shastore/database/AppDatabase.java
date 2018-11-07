@@ -58,4 +58,8 @@ public abstract class AppDatabase extends RoomDatabase {
     public Profile getProfile(String username) {
         return ProfileConverter.toProfile(profileDbDao().getProfileDb(username));
     }
+
+    public void addProfile(Profile profile) {
+        profileDbDao().insert(ProfileConverter.toProfileDb(profile));
+    }
 }
