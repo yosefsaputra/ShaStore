@@ -28,6 +28,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.yosef.shastore.R;
 import com.example.yosef.shastore.model.connectors.ProfileManager;
@@ -43,11 +44,14 @@ public class LoginActivity extends AppCompatActivity {
     private View mProgressView;
     private View mLoginFormView;
 
+    private SharedPreferences sharedPrefs;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         SharedPreferences sharedPrefs = SharedPreferenceHandler.getSharedPrefsCurrentUserSettings(this);
+
         if (sharedPrefs.getString(SharedPreferenceHandler.SHARED_PREFS_CURRENT_PROFILE_USERNAME, null) != null) {
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             startActivity(intent);
@@ -87,8 +91,17 @@ public class LoginActivity extends AppCompatActivity {
      * errors are presented and no actual login attempt is made.
      */
     private void attemptLogin() {
+        String attemptUsername = mUsernameView.getText().toString();
+
         ProfileManager profileManager = new ProfileManager();
-        profileManager.authenticateProfile(mUsernameView.getText().toString(), mPasswordView.getText().toString());
+        if (profileManager.authenticateProfile(attemptUsername, mPasswordView.getText().toString())) {
+            sharedPrefs.edit().putString(SharedPreferenceHandler.SHARED_PREFS_CURRENT_PROFILE_USERNAME, attemptUsername).apply();
+
+            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+            startActivity(intent);
+        } else {
+            Toast.makeText(this, String.format("Authentication unsuccessful %s", mUsernameView.getText().toString()), Toast.LENGTH_LONG).show();
+        }
     }
 
     private boolean isEmailValid(String email) {
