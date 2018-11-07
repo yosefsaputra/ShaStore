@@ -82,7 +82,14 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void registerProfile() {
-        // TODO: implement registering profile to a database
+        String registerUsername = mUsernameView.getText().toString();
+
+        ProfileManager profileManager = new ProfileManager();
+        if (profileManager.registerProfile(registerUsername, mPasswordView.getText().toString())) {
+            Toast.makeText(this, String.format("Registration successful %s", mUsernameView.getText().toString()), Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(this, String.format("Registration unsuccessful %s", mUsernameView.getText().toString()), Toast.LENGTH_LONG).show();
+        }
     }
 
     /**
