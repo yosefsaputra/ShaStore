@@ -20,7 +20,35 @@
 
 package com.example.yosef.shastore.database;
 
+import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
+import android.content.Context;
 
 public abstract class AppDatabase extends RoomDatabase {
+    private static AppDatabase INSTANCE;
+
+    public static void initializeDatabase(Context context) {
+        if (INSTANCE == null) {
+            INSTANCE = Room.databaseBuilder(context, AppDatabase.class, "AppDatabase")
+                    .allowMainThreadQueries()
+                    .fallbackToDestructiveMigration()
+                    .build();
+        }
+    }
+
+    public static AppDatabase getDatabase() throws NullPointerException {
+        if (INSTANCE != null) {
+            return INSTANCE;
+        } else {
+            throw new NullPointerException("AppDatabase has not been initialized");
+        }
+    }
+
+    public static void destroyInstance() {
+        INSTANCE = null;
+    }
+
+    public abstract ProfileDbDao profileDbDao();
+
+    public abstract DeviceDbDao deviceDbDao();
 }

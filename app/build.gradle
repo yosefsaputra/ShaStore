@@ -53,4 +53,7 @@ dependencies {
     annotationProcessor "android.arch.persistence.room:compiler:1.1.1"
 
     implementation 'com.google.android.gms:play-services-vision:17.0.2'
+
+    implementation "com.google.zxing:core:3.3.0"
+    implementation 'com.google.zxing:javase:3.3.0'
 }
