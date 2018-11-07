@@ -20,6 +20,46 @@
 
 package com.example.yosef.shastore.model.components;
 
+import android.util.Log;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 public class RegularFile extends FileObject {
     protected byte[] content;
+
+    public RegularFile(String name)
+    {
+        this.name = name;
+        try{
+            getInputStream().read(content);
+        } catch (IOException e){
+            Log.e(TAG, e.toString());
+            content = null;
+        }
+    }
+    public String getNamd(){
+        return  name;
+    }
+
+    public FileInputStream getInputStream(){
+        try {
+            return new FileInputStream(name);
+        } catch (FileNotFoundException e){
+            return null;
+        }
+    }
+    public FileOutputStream getOutputStream(){
+        try {
+            return new FileOutputStream(name);
+        } catch (FileNotFoundException e){
+            return null;
+        }
+    }
+
+    public byte[] getContent() {
+        return content;
+    }
 }

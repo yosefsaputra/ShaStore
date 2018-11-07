@@ -20,28 +20,50 @@
 
 package com.example.yosef.shastore.model.connectors;
 
+import android.util.Log;
+import android.widget.Toast;
+
 import com.example.yosef.shastore.model.components.EncryptedFile;
 import com.example.yosef.shastore.model.components.RegularFile;
 import com.example.yosef.shastore.model.components.SecureFile;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+
+import javax.crypto.Cipher;
+import javax.crypto.CipherOutputStream;
+import javax.crypto.SecretKey;
+
 public class GenericFileCryptoMachine extends FileCryptoMachine {
+    private static final String TAG = "In FileCrypto";
+
     @Override
-    public EncryptedFile encryptFile(RegularFile regularFile, byte[] fileKey) {
+    public EncryptedFile encryptFile(RegularFile regularFile, SecretKey fileKey) {
+        Cipher cipher;
+        try{
+            cipher = Cipher.getInstance("AES/CBC/PKCS5PADDING");
+            cipher.init(Cipher.ENCRYPT_MODE, fileKey);
+            byte[] encrypt = cipher.doFinal(regularFile.getContent());
+        } catch (Exception e){
+            Log.e(TAG, "cipher error: " + e.toString());
+            return null;
+        }
+
         return null;
     }
 
     @Override
-    public SecureFile secureFile(EncryptedFile encryptedFile, byte[] deviceKey) {
+    public SecureFile secureFile(EncryptedFile encryptedFile, SecretKey deviceKey) {
         return null;
     }
 
     @Override
-    public EncryptedFile unsecureFile(SecureFile secureFile, byte[] deviceKey) {
+    public EncryptedFile unsecureFile(SecureFile secureFile, SecretKey deviceKey) {
         return null;
     }
 
     @Override
-    public RegularFile decryptFile(EncryptedFile encryptedFile, byte[] fileKey) {
+    public RegularFile decryptFile(EncryptedFile encryptedFile, SecretKey fileKey) {
         return null;
     }
 }

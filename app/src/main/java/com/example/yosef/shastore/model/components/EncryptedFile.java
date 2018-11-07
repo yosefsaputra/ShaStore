@@ -20,11 +20,34 @@
 
 package com.example.yosef.shastore.model.components;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+
 public class EncryptedFile extends FileObject {
     protected SecureHeader header;
     protected byte[] securedContent;
 
     public class SecureHeader {
         protected byte[] fileKey;
+    }
+
+    public String getNamd(){return  name;}
+    public EncryptedFile(String name){
+        this.name = name;
+    }
+    public FileInputStream getInputStream(){
+        try {
+            return new FileInputStream(name);
+        } catch (FileNotFoundException e){
+            return null;
+        }
+    }
+    public FileOutputStream getOutputStream(){
+        try {
+            return new FileOutputStream(name);
+        } catch (FileNotFoundException e){
+            return null;
+        }
     }
 }

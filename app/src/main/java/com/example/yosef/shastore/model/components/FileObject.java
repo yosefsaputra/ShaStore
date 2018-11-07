@@ -21,5 +21,6 @@
 package com.example.yosef.shastore.model.components;
 
 public abstract class FileObject {
+    protected static final String TAG = "In File Object";
     protected String name;
 }

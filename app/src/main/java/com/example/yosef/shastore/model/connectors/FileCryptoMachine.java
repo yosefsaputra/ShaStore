@@ -24,10 +24,12 @@ import com.example.yosef.shastore.model.components.SecureFile;
 import com.example.yosef.shastore.model.components.RegularFile;
 import com.example.yosef.shastore.model.components.EncryptedFile;
 
-public abstract class FileCryptoMachine {
-    public abstract EncryptedFile encryptFile(RegularFile regularFile, byte[] fileKey);
-    public abstract SecureFile secureFile(EncryptedFile encryptedFile, byte[] deviceKey);
+import javax.crypto.SecretKey;
 
-    public abstract EncryptedFile unsecureFile(SecureFile secureFile, byte[] deviceKey);
-    public abstract RegularFile decryptFile(EncryptedFile encryptedFile, byte[] fileKey);
+public abstract class FileCryptoMachine {
+    public abstract EncryptedFile encryptFile(RegularFile regularFile, SecretKey key);
+    public abstract SecureFile secureFile(EncryptedFile encryptedFile, SecretKey key);
+
+    public abstract EncryptedFile unsecureFile(SecureFile secureFile, SecretKey key);
+    public abstract RegularFile decryptFile(EncryptedFile encryptedFile, SecretKey key);
 }
