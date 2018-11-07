@@ -4,6 +4,7 @@ import android.arch.persistence.room.Dao;
 import android.arch.persistence.room.Delete;
 import android.arch.persistence.room.Insert;
 import android.arch.persistence.room.OnConflictStrategy;
+import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
 @Dao
@@ -16,4 +17,7 @@ public interface ProfileDbDao {
 
     @Delete
     void delete(ProfileDb profileDb);
+
+    @Query("SELECT * FROM profiledb WHERE username=:username")
+    ProfileDb getProfileDb(String username);
 }
