@@ -20,34 +20,58 @@
 
 package com.example.yosef.shastore.model.components;
 
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 public class EncryptedFile extends FileObject {
-    protected SecureHeader header;
-    protected byte[] securedContent;
-
-    public class SecureHeader {
-        protected byte[] fileKey;
+    public EncryptedFile(){
+        name = "";
+        content = null;
     }
-
-    public String getNamd(){return  name;}
-    public EncryptedFile(String name){
+    public EncryptedFile(String name)
+    {
         this.name = name;
+        content = null;
     }
-    public FileInputStream getInputStream(){
-        try {
-            return new FileInputStream(name);
-        } catch (FileNotFoundException e){
-            return null;
+    @Override
+    public String getName(){
+        return name;
+    }
+
+    @Override
+    public void setName(String newName){
+        name = newName;
+    }
+
+    @Override
+    public byte[] getContent() {
+        return content;
+    }
+
+    @Override
+    public void readContent(InputStream inputStream) {
+        ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+
+        // this is storage overwritten on each iteration with bytes
+        byte[] buffer = new byte[1024];
+        int len = 0;
+        try{
+            while ((len = inputStream.read(buffer)) != -1) {
+                byteBuffer.write(buffer, 0, len);
+            }
+            content = byteBuffer.toByteArray();
+        }catch (IOException e){
+            return;
         }
     }
-    public FileOutputStream getOutputStream(){
-        try {
-            return new FileOutputStream(name);
-        } catch (FileNotFoundException e){
-            return null;
-        }
+
+    @Override
+    public void writeContent(OutputStream outputStream){
+        return;
     }
 }

@@ -20,7 +20,22 @@
 
 package com.example.yosef.shastore.model.components;
 
+import android.net.Uri;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+
+
 public abstract class FileObject {
     protected static final String TAG = "In File Object";
     protected String name;
+    protected byte[] content;
+
+    public abstract String getName();
+    public abstract void setName(String newName);
+    public abstract byte[] getContent();
+    public abstract void readContent (InputStream inputStream);
+    public abstract void writeContent(OutputStream outputStream);
 }

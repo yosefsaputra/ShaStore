@@ -22,8 +22,10 @@ package com.example.yosef.shastore.frontend;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.ParcelFileDescriptor;
+import android.provider.OpenableColumns;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -32,6 +34,9 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.yosef.shastore.R;
+import com.example.yosef.shastore.model.components.EncryptedFile;
+import com.example.yosef.shastore.model.components.FileObject;
+import com.example.yosef.shastore.model.components.RegularFile;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -49,7 +54,10 @@ public class MainActivity extends AppCompatActivity {
     private static EditText plainFileName;
     private static EditText secureFileName;
 
+    private static final String TAG= "In MainActivity";
 
+    private RegularFile plainFile = new RegularFile();
+    private EncryptedFile secureFile = new EncryptedFile();
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -113,6 +121,24 @@ public class MainActivity extends AppCompatActivity {
         inputStream.close();
         return stringBuilder.toString();
     }
+
+    private void readFileFromUri(Uri uri, FileObject newFile) throws IOException{
+        Cursor cursor = getContentResolver()
+                .query(uri, null, null, null, null, null);
+        try {
+            if (cursor != null && cursor.moveToFirst()) {
+                String displayName = cursor.getString(
+                        cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                Log.i(TAG, "Display Name: " + displayName);
+                newFile.setName(displayName);
+            }
+        } finally {
+            cursor.close();
+        }
+        InputStream inputStream = getContentResolver().openInputStream(uri);
+        newFile.readContent(inputStream);
+
+    }
     public void onActivityResult(int requestCode, int resultCode,
                                  Intent resultData) {
 
@@ -127,7 +153,8 @@ public class MainActivity extends AppCompatActivity {
                 if (resultData != null) {
                     currentUri = resultData.getData();
                     try {
-                        plainFileName.setText(currentUri.toString());
+                        readFileFromUri(currentUri, plainFile);
+                        plainFileName.setText(plainFile.getName());
                     } catch (Exception e) {
                         // Handle error here
                     }
@@ -139,7 +166,10 @@ public class MainActivity extends AppCompatActivity {
                 if (resultData != null) {
                     currentUri = resultData.getData();
                     try {
-                        secureFileName.setText(currentUri.toString());
+                        readFileFromUri(currentUri, secureFile);
+                        secureFileName.setText(secureFile.getName());
+                        //Toast.makeText(this, new String(secureFile.getContent()), Toast.LENGTH_LONG).show();
+                        //Log.i(TAG, new String(secureFile.getContent()));
                     } catch (Exception e) {
                         // Handle error here
                     }
