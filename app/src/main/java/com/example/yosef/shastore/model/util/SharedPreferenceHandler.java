@@ -24,11 +24,11 @@ import android.content.Context;
 import android.content.SharedPreferences;
 
 public class SharedPreferenceHandler {
-    public static String SHARED_PREFS_CURRENT_USER_SETTINGS = "edu.utexas.mpc.warble3.CURRENT_USER_SETTINGS";
-    public static String SHARED_PREFS_USERNAME = "";
+    public static String SHARED_PREFS_CURRENT_PROFILE_SETTINGS = "com.example.yosef.shastore.CURRENT_PROFILE_SETTINGS";
+    public static String SHARED_PREFS_CURRENT_PROFILE_USERNAME = "username";
 
     public static SharedPreferences getSharedPrefsCurrentUserSettings(Context context) {
-        return context.getSharedPreferences(SHARED_PREFS_CURRENT_USER_SETTINGS, Context.MODE_PRIVATE);
+        return context.getSharedPreferences(SHARED_PREFS_CURRENT_PROFILE_SETTINGS, Context.MODE_PRIVATE);
     }
 
     public static SharedPreferences.Editor getSharedPrefsEditorCurrentUserSettings(Context context) {
@@ -38,7 +38,9 @@ public class SharedPreferenceHandler {
     public static String getSharedPrefsString(Context context) {
         String string = "===== Shared Prefs =====";
         string += "\n";
-        string += String.format("%s: %s", SharedPreferenceHandler.SHARED_PREFS_USERNAME, SharedPreferenceHandler.getSharedPrefsCurrentUserSettings(context).getString(SharedPreferenceHandler.SHARED_PREFS_USERNAME, null));
+        string += String.format("%s: %s",
+                SHARED_PREFS_CURRENT_PROFILE_USERNAME,
+                SharedPreferenceHandler.getSharedPrefsCurrentUserSettings(context).getString(SHARED_PREFS_CURRENT_PROFILE_USERNAME, null));
         string += "\n";
         string += "========================";
         return string;
