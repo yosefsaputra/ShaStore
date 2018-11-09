@@ -13,9 +13,7 @@ package com.example.yosef.shastore.model.connectors;
  */
 
 public class GenericHashMachine extends HashMachine {
-    private String text;
     private String salt;
-    private String hashedText;
 
     public GenericHashMachine() {
         super();
@@ -28,6 +26,7 @@ public class GenericHashMachine extends HashMachine {
     @Override
     public boolean execute() {
         // TODO: implement the hashing algorithm here
+        hashedText = text;
         return false;
     }
 
