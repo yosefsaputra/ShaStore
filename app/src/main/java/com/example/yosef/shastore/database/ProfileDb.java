@@ -35,4 +35,13 @@ public class ProfileDb {
     public void setPasswordSalt(String passwordSalt) {
         this.passwordSalt = passwordSalt;
     }
+
+    @Override
+    public String toString() {
+        return "ProfileDb{" +
+                "username='" + username + '\'' +
+                ", passwordHash='" + passwordHash + '\'' +
+                ", passwordSalt='" + passwordSalt + '\'' +
+                '}';
+    }
 }

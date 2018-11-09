@@ -51,4 +51,15 @@ public class DeviceDb {
     public void setKey(String key) {
         this.key = key;
     }
+
+    @Override
+    public String toString() {
+        return "DeviceDb{" +
+                "dbid=" + dbid +
+                ", name='" + name + '\'' +
+                ", friendlyName='" + friendlyName + '\'' +
+                ", UUID='" + UUID + '\'' +
+                ", key='" + key + '\'' +
+                '}';
+    }
 }
