@@ -41,8 +41,6 @@ public class LoginActivity extends AppCompatActivity {
     // UI references.
     private EditText mUsernameView;
     private EditText mPasswordView;
-    private View mProgressView;
-    private View mLoginFormView;
 
     private SharedPreferences sharedPrefs;
 
@@ -50,7 +48,7 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        SharedPreferences sharedPrefs = SharedPreferenceHandler.getSharedPrefsCurrentUserSettings(this);
+        sharedPrefs = SharedPreferenceHandler.getSharedPrefsCurrentUserSettings(this);
 
         if (sharedPrefs.getString(SharedPreferenceHandler.SHARED_PREFS_CURRENT_PROFILE_USERNAME, null) != null) {
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
@@ -109,16 +107,6 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, String.format("Authentication unsuccessful %s", mUsernameView.getText().toString()), Toast.LENGTH_LONG).show();
         }
-    }
-
-    private boolean isEmailValid(String email) {
-        //TODO: Replace this with your own logic
-        return email.contains("@");
-    }
-
-    private boolean isPasswordValid(String password) {
-        //TODO: Replace this with your own logic
-        return password.length() > 4;
     }
 }
 
