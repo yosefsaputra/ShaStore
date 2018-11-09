@@ -7,6 +7,8 @@ import android.arch.persistence.room.OnConflictStrategy;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.Update;
 
+import java.util.List;
+
 @Dao
 public interface ProfileDbDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -20,4 +22,7 @@ public interface ProfileDbDao {
 
     @Query("SELECT * FROM profiledb WHERE username=:username")
     ProfileDb getProfileDb(String username);
+
+    @Query("SELECT * FROM profiledb")
+    List<ProfileDb> getAllProfileDbs();
 }
