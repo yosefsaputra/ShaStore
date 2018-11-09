@@ -24,14 +24,21 @@ import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
 import android.provider.OpenableColumns;
+import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.Toast;
 
 import com.example.yosef.shastore.R;
 import com.example.yosef.shastore.model.components.EncryptedFile;
@@ -58,18 +65,63 @@ public class MainActivity extends AppCompatActivity {
 
     private RegularFile plainFile = new RegularFile();
     private EncryptedFile secureFile = new EncryptedFile();
+
+    private ConstraintLayout layout;
+    private DrawerLayout drawerLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        layout = findViewById(R.id.main_activity_layout);
+        configureNavigationDrawer();
+        configureToolbar();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.drawer_main_activity, menu);
+        return true;
+    }
+
+    private void configureToolbar() {
+        Toolbar toolbar = findViewById(R.id.main_activity_toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionbar = getSupportActionBar();
+        actionbar.setHomeAsUpIndicator(R.drawable.ic_launcher_background);
+        actionbar.setDisplayHomeAsUpEnabled(true);
+    }
+
+    private void configureNavigationDrawer() {
+        drawerLayout = findViewById(R.id.main_activity_drawer_layout);
+        NavigationView navView = findViewById(R.id.main_activity_navigation_view);
+        navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(MenuItem menuItem) {
+                return false;
+            }
+        });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemId = item.getItemId();
+        switch (itemId) {
+            // Android home
+            case android.R.id.home:
+                drawerLayout.openDrawer(GravityCompat.START);
+                return true;
+            // manage other entries if you have it ...
+        }
+        return true;
     }
 
     @Override
     protected void onStart()
     {
         super.onStart();
-        plainFileName = (EditText) findViewById(R.id.plainFileName);
-        secureFileName = (EditText) findViewById(R.id.secureFileName);
+        plainFileName = findViewById(R.id.plainFileName);
+        secureFileName = findViewById(R.id.secureFileName);
     }
     public void newFile(View view)
     {
