@@ -17,6 +17,7 @@ public class ShastoreApplication extends Application {
         Context appContext = getApplicationContext();
 
         AppDatabase.initializeDatabase(appContext);
+        System.out.println(AppDatabase.getDatabase().toString());
     }
 
     @Override
