@@ -2,10 +2,12 @@ package com.example.yosef.shastore.database;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
 
 @Entity
 public class ProfileDb {
     @PrimaryKey
+    @NonNull
     private String username;
     private String passwordHash;
     private String passwordSalt;
