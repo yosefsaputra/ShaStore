@@ -34,18 +34,20 @@ import javax.crypto.spec.SecretKeySpec;
 public class ByteCrypto {
     private  static byte[] IV;
 
-    public static String key2Str(SecretKey key){
-        try{
-            return Base64.encodeToString(key.getEncoded(), Base64.DEFAULT);
-        } catch (Exception e){
-            return "";
-        }
+    public static String byte2Str(byte[] bytes){
+        return Base64.encodeToString(bytes, Base64.DEFAULT);
+    }
 
+    public static byte[] str2Byte(String str){
+        return Base64.decode(str, Base64.DEFAULT);
+    }
+    public static String key2Str(SecretKey key){
+        return byte2Str(key.getEncoded());
     }
 
     public static SecretKey str2Key(String str){
         try{
-            byte[] strB = Base64.decode(str, Base64.DEFAULT);
+            byte[] strB = str2Byte(str);
             return new SecretKeySpec(strB, 0, strB.length, "AES");
         }catch (Exception e){
             return null;
