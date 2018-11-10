@@ -76,6 +76,12 @@ public abstract class AppDatabase extends RoomDatabase {
         return fileDbDao().getFileDb(fileId);
     }
 
+    public void resetDatabase() {
+        profileDbDao().deleteAllProfileDbs();
+        deviceDbDao().deleteAllDeviceDbs();
+        fileDbDao().deleteAllFileDbs();
+    }
+
     public String toString() {
         return "===== Database =====\n" +
                 toStringProfileDbs()

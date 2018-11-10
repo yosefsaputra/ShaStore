@@ -25,4 +25,7 @@ public interface ProfileDbDao {
 
     @Query("SELECT * FROM profiledb")
     List<ProfileDb> getAllProfileDbs();
+
+    @Query("DELETE FROM profiledb")
+    void deleteAllProfileDbs();
 }

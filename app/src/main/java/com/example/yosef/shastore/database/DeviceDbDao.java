@@ -22,4 +22,7 @@ public interface DeviceDbDao {
 
     @Query("SELECT * FROM devicedb")
     List<DeviceDb> getAllDeviceDbs();
+
+    @Query("DELETE FROM devicedb")
+    void deleteAllDeviceDbs();
 }
