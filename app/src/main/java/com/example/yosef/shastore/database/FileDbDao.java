@@ -25,4 +25,7 @@ public interface FileDbDao {
 
     @Query("SELECT * FROM filedb")
     List<FileDb> getAllFileDbs();
+
+    @Query("DELETE FROM filedb")
+    void deleteAllFileDbs();
 }

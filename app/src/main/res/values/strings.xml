@@ -49,4 +49,6 @@
     <string name="menu_devices">Devices</string>
     <string name="menu_qrcode">QR Code</string>
     <string name="menu_sign_out">Sign Out</string>
+    <string name="debug_reset_database">Reset Database</string>
+    <string name="debug_print_database">Print Database</string>
 </resources>

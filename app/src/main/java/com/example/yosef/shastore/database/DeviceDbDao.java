@@ -25,4 +25,6 @@ public interface DeviceDbDao {
 
     @Query("SELECT * FROM devicedb WHERE UUID=:uuid")
     DeviceDb getDeviceById(String uuid);
+    @Query("DELETE FROM devicedb")
+    void deleteAllDeviceDbs();
 }
