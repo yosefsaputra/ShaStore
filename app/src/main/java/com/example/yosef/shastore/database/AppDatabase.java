@@ -25,7 +25,9 @@ import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 
+import com.example.yosef.shastore.database.converters.DeviceConverter;
 import com.example.yosef.shastore.database.converters.ProfileConverter;
+import com.example.yosef.shastore.model.components.Device;
 import com.example.yosef.shastore.model.components.Profile;
 
 import java.util.List;
@@ -63,6 +65,16 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract DeviceDbDao deviceDbDao();
 
     public abstract FileDbDao fileDbDao();
+
+
+    public Device getDevicebyId(String uuid){
+        return DeviceConverter.toDevice(deviceDbDao().getDeviceById(uuid));
+    }
+
+    public boolean addDevice(Device newD){
+
+        return deviceDbDao().insert(DeviceConverter.toDeviceDb(newD))!= 0;
+    }
 
     public Profile getProfile(String username) {
         return ProfileConverter.toProfile(profileDbDao().getProfileDb(username));

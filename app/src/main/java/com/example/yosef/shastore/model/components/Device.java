@@ -20,9 +20,27 @@
 
 package com.example.yosef.shastore.model.components;
 
+import android.util.Base64;
+import android.util.Log;
+
+import com.example.yosef.shastore.model.connectors.ByteCrypto;
+
+import javax.crypto.KeyGenerator;
+import javax.crypto.SecretKey;
+
 public class Device {
     protected String name;
-    protected String friendlyName;
     protected String UUID;
     protected String key;
+    public Device(String UUID, String key){
+        this.UUID = UUID;
+        this.key = key;
+        this.name = "";
+    }
+    public void setName(String name){
+        this.name = name;
+    }
+    public String getName() {return name;}
+    public String getUUID() {return UUID;}
+    public String getKey() {return key;}
 }
