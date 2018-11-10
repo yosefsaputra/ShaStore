@@ -35,7 +35,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -44,6 +43,7 @@ import com.example.yosef.shastore.R;
 import com.example.yosef.shastore.model.components.EncryptedFile;
 import com.example.yosef.shastore.model.components.FileObject;
 import com.example.yosef.shastore.model.components.RegularFile;
+import com.example.yosef.shastore.model.util.SharedPreferenceHandler;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -78,17 +78,11 @@ public class MainActivity extends AppCompatActivity {
         configureToolbar();
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.drawer_main_activity, menu);
-        return true;
-    }
-
     private void configureToolbar() {
         Toolbar toolbar = findViewById(R.id.main_activity_toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionbar = getSupportActionBar();
-        actionbar.setHomeAsUpIndicator(R.drawable.ic_launcher_background);
+        actionbar.setHomeAsUpIndicator(android.R.drawable.ic_menu_preferences);
         actionbar.setDisplayHomeAsUpEnabled(true);
     }
 
@@ -98,7 +92,28 @@ public class MainActivity extends AppCompatActivity {
         navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(MenuItem menuItem) {
-                return false;
+                switch (menuItem.getItemId()) {
+                    case R.id.menu_devices: {
+                        Intent intent = new Intent(getApplicationContext(), RegisteredDevicesActivity.class);
+                        startActivity(intent);
+                        break;
+                    }
+                    case R.id.menu_qrcode: {
+                        Intent intent = new Intent(getApplicationContext(), QRCodeGeneratorActivity.class);
+                        startActivity(intent);
+                        break;
+                    }
+                    case R.id.menu_sign_out: {
+                        SharedPreferenceHandler.getSharedPrefsEditorCurrentUserSettings(getApplicationContext()).putString(SharedPreferenceHandler.SHARED_PREFS_CURRENT_PROFILE_USERNAME, null).apply();
+                        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                        startActivity(intent);
+                        finish();
+                        break;
+                    }
+                    default: {
+                    }
+                }
+                return true;
             }
         });
     }
