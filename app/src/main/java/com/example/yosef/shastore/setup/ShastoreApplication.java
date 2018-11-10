@@ -22,6 +22,7 @@ package com.example.yosef.shastore.setup;
 
 import android.app.Application;
 import android.content.Context;
+import android.util.Log;
 
 import com.example.yosef.shastore.database.AppDatabase;
 import com.example.yosef.shastore.model.util.InternalStorageHandler;
@@ -30,6 +31,8 @@ import java.io.UnsupportedEncodingException;
 import java.util.UUID;
 
 public class ShastoreApplication extends Application {
+    private static String TAG = ShastoreApplication.class.getSimpleName();
+
     public static String FILE_NAME_INSTANCE_ID = "instanceid";
 
     @Override
@@ -49,11 +52,11 @@ public class ShastoreApplication extends Application {
         if (!instanceIdCheck) {
             createInstanceId();
         }
-        System.out.println(String.format("INSTANCE ID : %s", readInstanceId()));
+        Log.i(TAG, String.format("INSTANCE ID : %s", readInstanceId()));
 
         // Initialize Database
         AppDatabase.initializeDatabase(appContext);
-        System.out.println(AppDatabase.getDatabase().toString());
+        Log.i(TAG, AppDatabase.getDatabase().toString());
     }
 
     private boolean checkInstanceId() {

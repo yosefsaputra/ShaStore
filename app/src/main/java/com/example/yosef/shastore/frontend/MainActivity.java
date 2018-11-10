@@ -68,6 +68,7 @@ import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
 public class MainActivity extends AppCompatActivity {
+    private static String TAG = MainActivity.class.getSimpleName();
 
     private static final int CREATE_REQUEST_CODE = 40;
     private static final int ENCRYPT_REQUEST_CODE = 41;
@@ -77,7 +78,6 @@ public class MainActivity extends AppCompatActivity {
     private static EditText plainFileName;
     private static EditText secureFileName;
     private static SecretKey savedKey;
-    private static final String TAG = MainActivity.class.getSimpleName();
     private RegularFile plainFile = new RegularFile();
     private EncryptedFile secureFile = new EncryptedFile();
     private String action = "null";
@@ -150,7 +150,7 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.debug_print_database: {
                         String[] databaseStrings = AppDatabase.getDatabase().toString().split("\n");
                         for (String string : databaseStrings) {
-                            System.out.println(string);
+                            Log.i(TAG, string);
                         }
                         break;
                     }
