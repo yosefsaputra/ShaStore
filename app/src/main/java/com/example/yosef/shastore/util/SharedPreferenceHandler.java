@@ -3,8 +3,6 @@ package com.example.yosef.shastore.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import javax.crypto.SecretKey;
-
 public class SharedPreferenceHandler {
     public static String SHARED_PREFS_CURRENT_PROFILE_SETTINGS = "com.example.yosef.shastore.CURRENT_PROFILE_SETTINGS";
     public static String SHARED_PREFS_CURRENT_PROFILE_USERNAME = "username";

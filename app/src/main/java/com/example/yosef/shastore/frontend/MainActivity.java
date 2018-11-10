@@ -24,22 +24,30 @@ import android.app.Activity;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
 import android.provider.OpenableColumns;
+import android.support.constraint.ConstraintLayout;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.ShareActionProvider;
-import android.widget.Toast;
 
 import com.example.yosef.shastore.R;
+import com.example.yosef.shastore.database.AppDatabase;
 import com.example.yosef.shastore.model.components.EncryptedFile;
 import com.example.yosef.shastore.model.components.FileObject;
 import com.example.yosef.shastore.model.components.RegularFile;
 import com.example.yosef.shastore.model.connectors.ByteCrypto;
-import com.example.yosef.shastore.util.SharedPreferenceHandler;
+import com.example.yosef.shastore.model.util.InternalStorageHandler;
+import com.example.yosef.shastore.model.util.SharedPreferenceHandler;
+import com.example.yosef.shastore.setup.ShastoreApplication;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -47,6 +55,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 
 import javax.crypto.KeyGenerator;
@@ -65,10 +74,88 @@ public class MainActivity extends AppCompatActivity {
     private RegularFile plainFile = new RegularFile();
     private EncryptedFile secureFile = new EncryptedFile();
     private String action = "null";
+
+    private ConstraintLayout layout;
+    private DrawerLayout drawerLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        layout = findViewById(R.id.main_activity_layout);
+        configureNavigationDrawer();
+        configureToolbar();
+    }
+
+    private void configureToolbar() {
+        Toolbar toolbar = findViewById(R.id.main_activity_toolbar);
+        setSupportActionBar(toolbar);
+        ActionBar actionbar = getSupportActionBar();
+        actionbar.setHomeAsUpIndicator(android.R.drawable.ic_menu_preferences);
+        actionbar.setDisplayHomeAsUpEnabled(true);
+    }
+
+    private void configureNavigationDrawer() {
+        drawerLayout = findViewById(R.id.main_activity_drawer_layout);
+        NavigationView navView = findViewById(R.id.main_activity_navigation_view);
+        navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(MenuItem menuItem) {
+                switch (menuItem.getItemId()) {
+                    case R.id.menu_devices: {
+                        Intent intent = new Intent(getApplicationContext(), RegisteredDevicesActivity.class);
+                        startActivity(intent);
+                        break;
+                    }
+                    case R.id.menu_qrcode: {
+                        Intent intent = new Intent(getApplicationContext(), QRCodeGeneratorActivity.class);
+
+                        String passwordHash = AppDatabase.getDatabase().getProfile(
+                                SharedPreferenceHandler.getSharedPrefsCurrentUserSettings(getApplicationContext()).getString(
+                                        SharedPreferenceHandler.SHARED_PREFS_CURRENT_PROFILE_USERNAME,
+                                        null
+                                )
+                        ).getPasswordHash();
+
+                        String instanceId = null;
+                        try {
+                            instanceId = new String(InternalStorageHandler.readFile(getApplicationContext(), ShastoreApplication.FILE_NAME_INSTANCE_ID, new byte[16]), "UTF-8");
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
+
+                        intent.putExtra(QRCodeGeneratorActivity.PASSWORD_HASH_INTENT_EXTRA, passwordHash);
+                        intent.putExtra(QRCodeGeneratorActivity.DEVICE_UNIQUE_ID_INTENT_EXTRA, instanceId);
+                        intent.putExtra(QRCodeGeneratorActivity.DEVICE_KEY_INTENT_EXTRA, instanceId);
+                        startActivity(intent);
+                        break;
+                    }
+                    case R.id.menu_sign_out: {
+                        SharedPreferenceHandler.getSharedPrefsEditorCurrentUserSettings(getApplicationContext()).putString(SharedPreferenceHandler.SHARED_PREFS_CURRENT_PROFILE_USERNAME, null).apply();
+                        Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
+                        startActivity(intent);
+                        finish();
+                        break;
+                    }
+                    default: {
+                    }
+                }
+                return true;
+            }
+        });
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int itemId = item.getItemId();
+        switch (itemId) {
+            // Android home
+            case android.R.id.home:
+                drawerLayout.openDrawer(GravityCompat.START);
+                return true;
+            // manage other entries if you have it ...
+        }
+        return true;
     }
 
     @Override
@@ -78,6 +165,56 @@ public class MainActivity extends AppCompatActivity {
         plainFileName = (EditText) findViewById(R.id.plainFileName);
         secureFileName = (EditText) findViewById(R.id.secureFileName);
     }
+    public void newFile(View view)
+    {
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        //intent.setType("text/plain");
+        intent.setType("*/*");
+        intent.putExtra(Intent.EXTRA_TITLE, "newfile.txt");
+
+        startActivityForResult(intent, CREATE_REQUEST_CODE);
+    }
+
+    private void writeFileContent(Uri uri)
+    {
+        try{
+            ParcelFileDescriptor pfd =
+                    this.getContentResolver().
+                            openFileDescriptor(uri, "w");
+
+            FileOutputStream fileOutputStream =
+                    new FileOutputStream(pfd.getFileDescriptor());
+
+            String textContent =
+                    plainFileName.getText().toString();
+
+            fileOutputStream.write(textContent.getBytes());
+
+            fileOutputStream.close();
+            pfd.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    private String readFileContent(Uri uri) throws IOException {
+
+        InputStream inputStream =
+                getContentResolver().openInputStream(uri);
+        BufferedReader reader =
+                new BufferedReader(new InputStreamReader(
+                        inputStream));
+        StringBuilder stringBuilder = new StringBuilder();
+        String currentline;
+        while ((currentline = reader.readLine()) != null) {
+            stringBuilder.append(currentline + "\n");
+        }
+        inputStream.close();
+        return stringBuilder.toString();
+    }
 
     private void readFileFromUri(Uri uri, FileObject newFile) throws IOException{
         Cursor cursor = getContentResolver()
@@ -86,6 +223,7 @@ public class MainActivity extends AppCompatActivity {
             if (cursor != null && cursor.moveToFirst()) {
                 String displayName = cursor.getString(
                         cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                Log.i(TAG, "Display Name: " + displayName);
                 newFile.setName(displayName);
             }
         } finally {
@@ -139,6 +277,7 @@ public class MainActivity extends AppCompatActivity {
             Log.e(TAG, "Cannot open file " + plainUri.toString());
         }
     }
+
     public void onActivityResult(int requestCode, int resultCode,
                                  Intent resultData) {
 
@@ -206,6 +345,7 @@ public class MainActivity extends AppCompatActivity {
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         //intent.setType("text/plain");
         intent.setType("*/*");
+        intent.putExtra("ShaAction", "getDecryptFile");
         startActivityForResult(intent, DECRYPT_REQUEST_CODE);
     }
 
@@ -213,6 +353,7 @@ public class MainActivity extends AppCompatActivity {
     {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.putExtra("ShaAction", "getEncryptFile");
         intent.setType("*/*");
         startActivityForResult(intent, ENCRYPT_REQUEST_CODE);
     }

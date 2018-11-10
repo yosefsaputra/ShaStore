@@ -104,6 +104,7 @@ public class LoginActivity extends AppCompatActivity {
 
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             startActivity(intent);
+            finish();
         } else {
             Toast.makeText(this, String.format("Authentication unsuccessful %s", mUsernameView.getText().toString()), Toast.LENGTH_LONG).show();
         }

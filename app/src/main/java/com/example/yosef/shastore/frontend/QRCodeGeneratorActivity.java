@@ -22,9 +22,11 @@ package com.example.yosef.shastore.frontend;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.support.v7.app.AppCompatActivity;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.example.yosef.shastore.R;
 import com.google.zxing.BarcodeFormat;
@@ -33,9 +35,9 @@ import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 
 public class QRCodeGeneratorActivity extends AppCompatActivity {
-    public String PASSWORD_HASH_INTENT_EXTRA = "PASSWORD_HASH_INTENT_EXTRA";
-    public String DEVICE_UNIQUE_ID_INTENT_EXTRA = "DEVICE_UNIQUE_ID_INTENT_EXTRA";
-    public String DEVICE_KEY_INTENT_EXTRA = "DEVICE_KEY_INTENT_EXTRA";
+    public static String PASSWORD_HASH_INTENT_EXTRA = "PASSWORD_HASH_INTENT_EXTRA";
+    public static String DEVICE_UNIQUE_ID_INTENT_EXTRA = "DEVICE_UNIQUE_ID_INTENT_EXTRA";
+    public static String DEVICE_KEY_INTENT_EXTRA = "DEVICE_KEY_INTENT_EXTRA";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,8 +49,12 @@ public class QRCodeGeneratorActivity extends AppCompatActivity {
         String deviceUniqueId = intent.getStringExtra(DEVICE_UNIQUE_ID_INTENT_EXTRA);
         String deviceKey = intent.getStringExtra(DEVICE_KEY_INTENT_EXTRA);
 
-        ImageView qrcode_imageview = findViewById(R.id.qrcode_imageview);
-        qrcode_imageview.setImageBitmap(null);
+        if (passwordHash == null || deviceUniqueId == null || deviceKey == null) {
+            Toast.makeText(this, "Invalid QR code", Toast.LENGTH_LONG).show();
+        } else {
+            ImageView qrcode_imageview = findViewById(R.id.qrcode_imageview);
+            qrcode_imageview.setImageBitmap(generateQrCode(passwordHash, deviceUniqueId, deviceKey));
+        }
     }
 
     protected Bitmap generateQrCode(String passwordHash, String deviceUniqueId, String deviceKey) {
@@ -60,13 +66,22 @@ public class QRCodeGeneratorActivity extends AppCompatActivity {
         );
         try {
             BitMatrix bitMatrix = qrCodeWriter.encode(text, BarcodeFormat.QR_CODE, 350, 350);
-            // TODO: convert BitMatrix to Bitmap
+
+            Bitmap bitmap = Bitmap.createBitmap(
+                    bitMatrix.getWidth(),
+                    bitMatrix.getHeight(),
+                    Bitmap.Config.RGB_565
+            );
+            for (int x = 0; x < bitMatrix.getWidth(); x++) {
+                for (int y = 0; y < bitMatrix.getHeight(); y++) {
+                    bitmap.setPixel(x, y, bitMatrix.get(x, y) ? Color.BLACK : Color.WHITE);
+                }
+            }
+
+            return bitmap;
         } catch (WriterException e) {
             e.printStackTrace();
             return null;
         }
-
-        // TODO: return the Bitmap
-        return null;
     }
 }
