@@ -20,10 +20,20 @@
 
 package com.example.yosef.shastore.database;
 
+import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 
+import com.example.yosef.shastore.database.converters.ProfileConverter;
+import com.example.yosef.shastore.model.components.Profile;
+
+import java.util.List;
+import java.util.Locale;
+
+@Database(entities = {ProfileDb.class, DeviceDb.class},
+        version = 1,
+        exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
     private static AppDatabase INSTANCE;
 
@@ -51,4 +61,55 @@ public abstract class AppDatabase extends RoomDatabase {
     public abstract ProfileDbDao profileDbDao();
 
     public abstract DeviceDbDao deviceDbDao();
+
+    public Profile getProfile(String username) {
+        return ProfileConverter.toProfile(profileDbDao().getProfileDb(username));
+    }
+
+    public boolean addProfile(Profile profile) {
+        return profileDbDao().insert(ProfileConverter.toProfileDb(profile)) != 0;
+    }
+
+    public String toString() {
+        return "===== Database =====\n" +
+                toStringProfileDbs()
+                + "\n" +
+                toStringDeviceDbs()
+                + "\n" +
+                "====================";
+    }
+
+    private String toStringProfileDbs() {
+        StringBuilder stringBuilder = new StringBuilder();
+        List<ProfileDb> profileDbs = getDatabase().profileDbDao().getAllProfileDbs();
+        if (profileDbs == null) {
+            stringBuilder.append("Number of ProfileDb : 0");
+        } else {
+            stringBuilder.append(String.format(Locale.getDefault(), "Number of ProfileDb : %d", profileDbs.size()));
+            for (ProfileDb profileDb : profileDbs) {
+                stringBuilder.append("\n");
+                stringBuilder.append("- ");
+                stringBuilder.append(profileDb.toString());
+            }
+        }
+
+        return stringBuilder.toString();
+    }
+
+    private String toStringDeviceDbs() {
+        StringBuilder stringBuilder = new StringBuilder();
+        List<DeviceDb> deviceDbs = getDatabase().deviceDbDao().getAllDeviceDbs();
+        if (deviceDbs == null) {
+            stringBuilder.append("Number of DeviceDb : 0");
+        } else {
+            stringBuilder.append(String.format(Locale.getDefault(), "Number of DeviceDb : %d", deviceDbs.size()));
+            for (DeviceDb deviceDb : deviceDbs) {
+                stringBuilder.append("\n");
+                stringBuilder.append("- ");
+                stringBuilder.append(deviceDb.toString());
+            }
+        }
+
+        return stringBuilder.toString();
+    }
 }

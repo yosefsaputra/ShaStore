@@ -22,5 +22,30 @@ package com.example.yosef.shastore.model.components;
 
 public class Profile {
     protected String username;
-    protected String password; // TODO : make it secure
+    protected String passwordHash; // TODO : make it secure
+    protected String passwordSalt;
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPasswordHash() {
+        return passwordHash;
+    }
+
+    public void setPasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
+
+    public String getPasswordSalt() {
+        return passwordSalt;
+    }
+
+    public void setPasswordSalt(String passwordSalt) {
+        this.passwordSalt = passwordSalt;
+    }
 }
