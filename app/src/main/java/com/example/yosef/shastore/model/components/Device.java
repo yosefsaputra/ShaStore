@@ -20,14 +20,18 @@
 
 package com.example.yosef.shastore.model.components;
 
-import android.util.Log;
-
-import com.example.yosef.shastore.model.connectors.ByteCrypto;
-
 public class Device {
     protected String name;
     protected String UUID;
     protected String key;
+
+    public Device() {
+    }
+
+    public Device(String uuid, String key) {
+        this.UUID = uuid;
+        this.key = key;
+    }
 
     public String getName() {
         return name;
@@ -35,14 +39,6 @@ public class Device {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getFriendlyName() {
-        return friendlyName;
-    }
-
-    public void setFriendlyName(String friendlyName) {
-        this.friendlyName = friendlyName;
     }
 
     public String getUUID() {

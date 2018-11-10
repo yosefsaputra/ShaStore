@@ -33,7 +33,6 @@ public class DeviceConverter {
         Device device = new Device();
 
         device.setName(deviceDb.getName());
-        device.setFriendlyName(deviceDb.getName());
         device.setUUID(deviceDb.getUUID());
         device.setKey(deviceDb.getKey());
 

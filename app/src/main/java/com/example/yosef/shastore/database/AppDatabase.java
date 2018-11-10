@@ -72,7 +72,6 @@ public abstract class AppDatabase extends RoomDatabase {
     }
 
     public boolean addDevice(Device newD){
-
         return deviceDbDao().insert(DeviceConverter.toDeviceDb(newD))!= 0;
     }
 
@@ -86,10 +85,6 @@ public abstract class AppDatabase extends RoomDatabase {
 
     public FileDb getFileDb(String fileId) {
         return fileDbDao().getFileDb(fileId);
-    }
-
-    public boolean addDevice(Device device) {
-        return deviceDbDao().insert(DeviceConverter.toDeviceDb(device)) != 0;
     }
 
     public void resetDatabase() {
