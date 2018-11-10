@@ -100,6 +100,10 @@ public class MainActivity extends AppCompatActivity {
                     }
                     case R.id.menu_qrcode: {
                         Intent intent = new Intent(getApplicationContext(), QRCodeGeneratorActivity.class);
+                        // TODO: change with real data
+                        intent.putExtra(QRCodeGeneratorActivity.PASSWORD_HASH_INTENT_EXTRA, "passwordHash");
+                        intent.putExtra(QRCodeGeneratorActivity.DEVICE_UNIQUE_ID_INTENT_EXTRA, "uuid");
+                        intent.putExtra(QRCodeGeneratorActivity.DEVICE_KEY_INTENT_EXTRA, "deviceKey");
                         startActivity(intent);
                         break;
                     }
