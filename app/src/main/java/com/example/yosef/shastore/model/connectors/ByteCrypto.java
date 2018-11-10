@@ -20,10 +20,10 @@
 
 package com.example.yosef.shastore.model.connectors;
 
+import android.util.Base64;
 import android.util.Log;
 
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 
 import javax.crypto.Cipher;
@@ -60,9 +60,9 @@ public class ByteCrypto {
 //            Log.i("!!!!!!!", Arrays.toString(newK.getEncoded()));
 //            Log.i("!!!!!!!", key2Str(newK).length() + "");
 //            Log.i("!!!!!!!", Arrays.toString(key2Str(newK).getBytes("UTF-8")));
-            String newS = new String(arr, "UTF-8");
+            String newS = Base64.encodeToString(arr, Base64.DEFAULT);
             Log.i("!!!!!!!!", newS);
-            Log.i("!!!!!!!!",Arrays.toString(newS.getBytes("UTF-8")));
+            Log.i("!!!!!!!!",Arrays.toString(Base64.decode(newS, Base64.DEFAULT)));
             return ByteCrypto.key2Str(newK);
         } catch (Exception e){
             Log.e("In Device", e.toString());
