@@ -10,7 +10,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.UUID;
 
 public class ShastoreApplication extends Application {
-    private static String FILE_NAME_INSTANCE_ID = "instanceid";
+    public static String FILE_NAME_INSTANCE_ID = "instanceid";
 
     @Override
     public void onCreate() {

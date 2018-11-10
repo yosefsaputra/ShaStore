@@ -26,6 +26,7 @@ import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.example.yosef.shastore.R;
 import com.google.zxing.BarcodeFormat;
@@ -48,8 +49,12 @@ public class QRCodeGeneratorActivity extends AppCompatActivity {
         String deviceUniqueId = intent.getStringExtra(DEVICE_UNIQUE_ID_INTENT_EXTRA);
         String deviceKey = intent.getStringExtra(DEVICE_KEY_INTENT_EXTRA);
 
-        ImageView qrcode_imageview = findViewById(R.id.qrcode_imageview);
-        qrcode_imageview.setImageBitmap(generateQrCode(passwordHash, deviceUniqueId, deviceKey));
+        if (passwordHash == null || deviceUniqueId == null || deviceKey == null) {
+            Toast.makeText(this, "Invalid QR code", Toast.LENGTH_LONG).show();
+        } else {
+            ImageView qrcode_imageview = findViewById(R.id.qrcode_imageview);
+            qrcode_imageview.setImageBitmap(generateQrCode(passwordHash, deviceUniqueId, deviceKey));
+        }
     }
 
     protected Bitmap generateQrCode(String passwordHash, String deviceUniqueId, String deviceKey) {

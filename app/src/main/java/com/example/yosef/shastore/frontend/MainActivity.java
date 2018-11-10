@@ -40,10 +40,13 @@ import android.view.View;
 import android.widget.EditText;
 
 import com.example.yosef.shastore.R;
+import com.example.yosef.shastore.database.AppDatabase;
 import com.example.yosef.shastore.model.components.EncryptedFile;
 import com.example.yosef.shastore.model.components.FileObject;
 import com.example.yosef.shastore.model.components.RegularFile;
+import com.example.yosef.shastore.model.util.InternalStorageHandler;
 import com.example.yosef.shastore.model.util.SharedPreferenceHandler;
+import com.example.yosef.shastore.setup.ShastoreApplication;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -51,6 +54,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -100,10 +104,24 @@ public class MainActivity extends AppCompatActivity {
                     }
                     case R.id.menu_qrcode: {
                         Intent intent = new Intent(getApplicationContext(), QRCodeGeneratorActivity.class);
-                        // TODO: change with real data
-                        intent.putExtra(QRCodeGeneratorActivity.PASSWORD_HASH_INTENT_EXTRA, "passwordHash");
-                        intent.putExtra(QRCodeGeneratorActivity.DEVICE_UNIQUE_ID_INTENT_EXTRA, "uuid");
-                        intent.putExtra(QRCodeGeneratorActivity.DEVICE_KEY_INTENT_EXTRA, "deviceKey");
+
+                        String passwordHash = AppDatabase.getDatabase().getProfile(
+                                SharedPreferenceHandler.getSharedPrefsCurrentUserSettings(getApplicationContext()).getString(
+                                        SharedPreferenceHandler.SHARED_PREFS_CURRENT_PROFILE_USERNAME,
+                                        null
+                                )
+                        ).getPasswordHash();
+
+                        String instanceId = null;
+                        try {
+                            instanceId = new String(InternalStorageHandler.readFile(getApplicationContext(), ShastoreApplication.FILE_NAME_INSTANCE_ID, new byte[16]), "UTF-8");
+                        } catch (UnsupportedEncodingException e) {
+                            e.printStackTrace();
+                        }
+
+                        intent.putExtra(QRCodeGeneratorActivity.PASSWORD_HASH_INTENT_EXTRA, passwordHash);
+                        intent.putExtra(QRCodeGeneratorActivity.DEVICE_UNIQUE_ID_INTENT_EXTRA, instanceId);
+                        intent.putExtra(QRCodeGeneratorActivity.DEVICE_KEY_INTENT_EXTRA, instanceId);
                         startActivity(intent);
                         break;
                     }
