@@ -155,6 +155,11 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    public void registerDevice(View view) {
+        Intent intent = new Intent(this, RegistrationCameraActivity.class);
+        startActivity(intent);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int itemId = item.getItemId();
