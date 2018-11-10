@@ -140,6 +140,13 @@ public class MainActivity extends AppCompatActivity {
                         finish();
                         break;
                     }
+                    case R.id.debug_print_database: {
+                        String[] databaseStrings = AppDatabase.getDatabase().toString().split("\n");
+                        for (String string : databaseStrings) {
+                            System.out.println(string);
+                        }
+                        break;
+                    }
                     default: {
                     }
                 }

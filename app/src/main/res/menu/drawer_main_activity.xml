@@ -13,6 +13,9 @@
             android:id="@+id/menu_sign_out"
             android:title="@string/menu_sign_out" />
         <item
+            android:id="@+id/debug_print_database"
+            android:title="@string/debug_print_database" />
+        <item
             android:id="@+id/debug_reset_database"
             android:title="@string/debug_reset_database" />
     </group>
