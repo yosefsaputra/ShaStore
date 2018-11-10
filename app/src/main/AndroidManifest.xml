@@ -41,9 +41,7 @@
             <!--</intent-filter>-->
         </activity>
 
-        <activity
-            android:name=".frontend.LoginActivity"
-            android:label="@string/title_activity_login">
+        <activity android:name=".frontend.LoginActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
