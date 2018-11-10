@@ -61,7 +61,7 @@ public class DeviceDb {
     @Override
     public String toString() {
         return "DeviceDb{" +
-                ", name='" + name + '\'' +
+                "name='" + name + '\'' +
                 ", UUID='" + UUID + '\'' +
                 ", key='" + key + '\'' +
                 '}';
