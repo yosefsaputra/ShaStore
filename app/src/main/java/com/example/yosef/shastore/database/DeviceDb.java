@@ -2,23 +2,17 @@ package com.example.yosef.shastore.database;
 
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
+import android.support.annotation.NonNull;
 
 @Entity
 public class DeviceDb {
-    @PrimaryKey(autoGenerate = true)
-    private long dbid;
-    private String name;
-    private String friendlyName;
+    @PrimaryKey
+    @NonNull
     private String UUID;
+
+    @NonNull
     private String key;
-
-    public long getDbid() {
-        return dbid;
-    }
-
-    public void setDbid(long dbid) {
-        this.dbid = dbid;
-    }
+    private String name;
 
     public String getName() {
         return name;
@@ -26,14 +20,6 @@ public class DeviceDb {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getFriendlyName() {
-        return friendlyName;
-    }
-
-    public void setFriendlyName(String friendlyName) {
-        this.friendlyName = friendlyName;
     }
 
     public String getUUID() {
@@ -55,9 +41,7 @@ public class DeviceDb {
     @Override
     public String toString() {
         return "DeviceDb{" +
-                "dbid=" + dbid +
                 ", name='" + name + '\'' +
-                ", friendlyName='" + friendlyName + '\'' +
                 ", UUID='" + UUID + '\'' +
                 ", key='" + key + '\'' +
                 '}';

@@ -24,6 +24,8 @@
     <!-- Strings related to login -->
     <string name="prompt_username">Username</string>
     <string name="prompt_password">Password (required)</string>
+    <string name="prompt_deviceName">Name your device</string>
+
     <string name="action_sign_in">Sign in or register</string>
     <string name="action_sign_in_short">Sign in</string>
     <string name="action_register">Register</string>

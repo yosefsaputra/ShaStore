@@ -41,7 +41,7 @@ public class LoginActivity extends AppCompatActivity {
     // UI references.
     private EditText mUsernameView;
     private EditText mPasswordView;
-
+    private EditText mDeviceNameView;
     private SharedPreferences sharedPrefs;
 
     @Override
@@ -49,6 +49,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         sharedPrefs = SharedPreferenceHandler.getSharedPrefsCurrentUserSettings(this);
+        String defaultName = android.os.Build.MODEL;
 
         if (sharedPrefs.getString(SharedPreferenceHandler.SHARED_PREFS_CURRENT_PROFILE_USERNAME, null) != null) {
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
@@ -57,10 +58,13 @@ public class LoginActivity extends AppCompatActivity {
             setContentView(R.layout.activity_login);
 
             // Set up the login form.
+            mDeviceNameView = findViewById(R.id.device_name);
+
             mUsernameView = findViewById(R.id.username);
 
             mPasswordView = findViewById(R.id.password);
 
+            mDeviceNameView.setText(defaultName);
             Button mSignInButton = findViewById(R.id.sign_in_button);
             mSignInButton.setOnClickListener(new OnClickListener() {
                 @Override
@@ -108,6 +112,7 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, String.format("Authentication unsuccessful %s", mUsernameView.getText().toString()), Toast.LENGTH_LONG).show();
         }
+
     }
 }
 

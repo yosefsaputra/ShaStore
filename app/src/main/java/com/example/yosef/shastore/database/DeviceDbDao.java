@@ -22,4 +22,7 @@ public interface DeviceDbDao {
 
     @Query("SELECT * FROM devicedb")
     List<DeviceDb> getAllDeviceDbs();
+
+    @Query("SELECT * FROM devicedb WHERE UUID=:uuid")
+    DeviceDb getDeviceById(String uuid);
 }
