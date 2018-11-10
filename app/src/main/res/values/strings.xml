@@ -46,4 +46,5 @@
     <string name="title_activity_file_selector">FileSelector</string>
     <string name="menu_devices">Devices</string>
     <string name="menu_qrcode">QR Code</string>
+    <string name="menu_sign_out">Sign Out</string>
 </resources>
