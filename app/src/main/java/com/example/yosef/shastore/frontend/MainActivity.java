@@ -26,6 +26,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
+import android.provider.DocumentsContract;
 import android.provider.OpenableColumns;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.NavigationView;
@@ -262,6 +263,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void doDecryption(FileObject secureFile, Uri plainUri){
         try{
+//            DocumentsContract.deleteDocument(getContentResolver(), plainUri);
+//            return;
             plainFile = new RegularFile();
             byte[] plainText = ByteCrypto.decryptByte(secureFile.getContent(), savedKey);
             ParcelFileDescriptor pfd = this.getContentResolver().
@@ -345,7 +348,7 @@ public class MainActivity extends AppCompatActivity {
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         //intent.setType("text/plain");
         intent.setType("*/*");
-        intent.putExtra("ShaAction", "getDecryptFile");
+        intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
         startActivityForResult(intent, DECRYPT_REQUEST_CODE);
     }
 
@@ -353,7 +356,7 @@ public class MainActivity extends AppCompatActivity {
     {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.putExtra("ShaAction", "getEncryptFile");
+        intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
         intent.setType("*/*");
         startActivityForResult(intent, ENCRYPT_REQUEST_CODE);
     }
@@ -361,6 +364,7 @@ public class MainActivity extends AppCompatActivity {
     public void saveFile(View view){
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
         intent.setType("text/plain");
         startActivityForResult(intent, CREATE_REQUEST_CODE);
     }

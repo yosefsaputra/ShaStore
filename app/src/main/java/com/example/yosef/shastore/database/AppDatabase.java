@@ -31,7 +31,7 @@ import com.example.yosef.shastore.model.components.Profile;
 import java.util.List;
 import java.util.Locale;
 
-@Database(entities = {ProfileDb.class, DeviceDb.class},
+@Database(entities = {ProfileDb.class, DeviceDb.class, FileDb.class},
         version = 1,
         exportSchema = false)
 public abstract class AppDatabase extends RoomDatabase {
@@ -62,6 +62,8 @@ public abstract class AppDatabase extends RoomDatabase {
 
     public abstract DeviceDbDao deviceDbDao();
 
+    public abstract FileDbDao fileDbDao();
+
     public Profile getProfile(String username) {
         return ProfileConverter.toProfile(profileDbDao().getProfileDb(username));
     }
@@ -70,11 +72,17 @@ public abstract class AppDatabase extends RoomDatabase {
         return profileDbDao().insert(ProfileConverter.toProfileDb(profile)) != 0;
     }
 
+    public FileDb getFileDb(String fileId) {
+        return fileDbDao().getFileDb(fileId);
+    }
+
     public String toString() {
         return "===== Database =====\n" +
                 toStringProfileDbs()
                 + "\n" +
                 toStringDeviceDbs()
+                + "\n" +
+                toStringFileDbs()
                 + "\n" +
                 "====================";
     }
@@ -107,6 +115,23 @@ public abstract class AppDatabase extends RoomDatabase {
                 stringBuilder.append("\n");
                 stringBuilder.append("- ");
                 stringBuilder.append(deviceDb.toString());
+            }
+        }
+
+        return stringBuilder.toString();
+    }
+
+    private String toStringFileDbs() {
+        StringBuilder stringBuilder = new StringBuilder();
+        List<FileDb> fileDbs = getDatabase().fileDbDao().getAllFileDbs();
+        if (fileDbs == null) {
+            stringBuilder.append("Number of FileDb : 0");
+        } else {
+            stringBuilder.append(String.format(Locale.getDefault(), "Number of FileDb : %d", fileDbs.size()));
+            for (FileDb fileDb : fileDbs) {
+                stringBuilder.append("\n");
+                stringBuilder.append("- ");
+                stringBuilder.append(fileDb.toString());
             }
         }
 
