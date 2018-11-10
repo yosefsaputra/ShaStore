@@ -8,7 +8,6 @@ import javax.crypto.SecretKey;
 public class SharedPreferenceHandler {
     public static String SHARED_PREFS_CURRENT_PROFILE_SETTINGS = "com.example.yosef.shastore.CURRENT_PROFILE_SETTINGS";
     public static String SHARED_PREFS_CURRENT_PROFILE_USERNAME = "username";
-    public static String SHARED_PREFS_CURRENT_PROFILE_SAVEDKEY = "savedKey";
 
 
     public static SharedPreferences getSharedPrefsCurrentUserSettings(Context context) {
