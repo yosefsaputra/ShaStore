@@ -27,42 +27,45 @@
     <uses-permission android:name="android.permission.CAMERA" />
 
     <application
+        android:name=".setup.ShastoreApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity android:name=".frontend.MainActivity" >
+<<<<<<< HEAD
+        android:theme="@style/MyAppTheme">
+        <activity android:name=".frontend.MainActivity"></activity>
+        <activity
+            android:name=".frontend.LoginActivity"
+            android:label="@string/title_activity_login">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-<<<<<<< HEAD
-
-        <activity
-            android:name=".frontend.LoginActivity"
-            android:label="@string/title_activity_login">
+=======
+        android:theme="@style/AppTheme">
+        <activity android:name=".frontend.MainActivity" >
             <!--<intent-filter>-->
                 <!--<action android:name="android.intent.action.MAIN" />-->
                 <!--<category android:name="android.intent.category.LAUNCHER" />-->
             <!--</intent-filter>-->
         </activity>
-        <activity android:name=".frontend.RegistrationCameraActivity" />
-        <activity android:name=".frontend.RegistrationConfirmationActivity" />
-        <activity android:name=".frontend.QRCodeActivity" />
-        <activity android:name=".frontend.RegisteredDevicesActivity" />
+
         <activity
-            android:name=".frontend.FileSelector"
-            android:label="@string/title_activity_file_selector"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
-=======
+            android:name=".frontend.LoginActivity"
+            android:label="@string/title_activity_login">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+>>>>>>> 2c6de963aaa4059bd6e62414cde5be347b81dbc5
         <activity android:name=".frontend.QRCodeGeneratorActivity" />
         <activity android:name=".frontend.RegistrationConfirmationActivity" />
         <activity android:name=".frontend.RegistrationCameraActivity" />
-        <activity android:name=".frontend.RegisteredDevicesActivity"></activity>
->>>>>>> 66a62e8697e8ccf921a5653c211f402684e5d999
+        <activity android:name=".frontend.RegisteredDevicesActivity" />
     </application>
 
 </manifest>

@@ -20,22 +20,50 @@
 
 package com.example.yosef.shastore.model.components;
 
-import android.net.Uri;
+import android.util.Log;
 
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
 
 public abstract class FileObject {
-    protected static final String TAG = "In File Object";
+    protected static final String TAG = FileObject.class.getSimpleName();
     protected String name;
     protected byte[] content;
 
-    public abstract String getName();
-    public abstract void setName(String newName);
-    public abstract byte[] getContent();
-    public abstract void readContent (InputStream inputStream);
-    public abstract void writeContent(OutputStream outputStream);
+    public String getName(){
+        return name;
+    }
+
+    public void setName(String newName){
+        name = newName;
+    }
+
+
+    public byte[] getContent() {
+        return content;
+    }
+    public void setContent(byte[] c){
+        content =c;
+        return;
+    }
+
+    public void readContent(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+        // this is storage overwritten on each iteration with bytes
+        byte[] buffer = new byte[1024];
+        int len = 0;
+        while ((len = inputStream.read(buffer)) != -1) {
+            byteBuffer.write(buffer, 0, len);
+        }
+        content = byteBuffer.toByteArray();
+    }
+    public void writeContent(OutputStream outputStream) throws IOException {
+        Log.d(TAG, "writing to file content:" + new String(content));
+        outputStream.write(content);
+        outputStream.flush();
+        outputStream.close();
+    }
 }
