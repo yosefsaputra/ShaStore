@@ -26,7 +26,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
-import android.provider.DocumentsContract;
 import android.provider.OpenableColumns;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.NavigationView;
@@ -131,6 +130,9 @@ public class MainActivity extends AppCompatActivity {
                         startActivity(intent);
                         break;
                     }
+                    case R.id.debug_reset_database: {
+                        AppDatabase.getDatabase().resetDatabase();
+                    }
                     case R.id.menu_sign_out: {
                         SharedPreferenceHandler.getSharedPrefsEditorCurrentUserSettings(getApplicationContext()).putString(SharedPreferenceHandler.SHARED_PREFS_CURRENT_PROFILE_USERNAME, null).apply();
                         Intent intent = new Intent(getApplicationContext(), LoginActivity.class);
@@ -163,8 +165,8 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart()
     {
         super.onStart();
-        plainFileName = (EditText) findViewById(R.id.plainFileName);
-        secureFileName = (EditText) findViewById(R.id.secureFileName);
+        plainFileName = findViewById(R.id.plainFileName);
+        secureFileName = findViewById(R.id.secureFileName);
     }
     public void newFile(View view)
     {
