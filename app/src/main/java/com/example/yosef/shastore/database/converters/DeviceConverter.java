@@ -18,52 +18,39 @@
  * IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.example.yosef.shastore.database;
+package com.example.yosef.shastore.database.converters;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.PrimaryKey;
-import android.support.annotation.NonNull;
 
-@Entity
-public class DeviceDb {
-    @PrimaryKey
-    @NonNull
-    private String UUID;
+import com.example.yosef.shastore.database.DeviceDb;
+import com.example.yosef.shastore.model.components.Device;
 
-    @NonNull
-    private String key;
-    private String name;
+public class DeviceConverter {
+    public static Device toDevice(DeviceDb deviceDb) {
+        if (deviceDb == null) {
+            return null;
+        }
 
-    public String getName() {
-        return name;
+        Device device = new Device();
+
+        device.setName(deviceDb.getName());
+        device.setFriendlyName(deviceDb.getName());
+        device.setUUID(deviceDb.getUUID());
+        device.setKey(deviceDb.getKey());
+
+        return device;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+    public static DeviceDb toDeviceDb(Device device) {
+        if (device == null) {
+            return null;
+        }
 
-    public String getUUID() {
-        return UUID;
-    }
+        DeviceDb deviceDb = new DeviceDb();
 
-    public void setUUID(String UUID) {
-        this.UUID = UUID;
-    }
+        deviceDb.setName(device.getName());
+        deviceDb.setUUID(device.getUUID());
+        deviceDb.setKey(device.getKey());
 
-    public String getKey() {
-        return key;
-    }
-
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    @Override
-    public String toString() {
-        return "DeviceDb{" +
-                "name='" + name + '\'' +
-                ", UUID='" + UUID + '\'' +
-                ", key='" + key + '\'' +
-                '}';
+        return deviceDb;
     }
 }

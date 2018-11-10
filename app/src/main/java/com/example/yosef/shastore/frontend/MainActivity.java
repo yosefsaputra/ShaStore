@@ -38,16 +38,20 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.yosef.shastore.R;
 import com.example.yosef.shastore.database.AppDatabase;
+import com.example.yosef.shastore.model.components.Device;
 import com.example.yosef.shastore.model.components.EncryptedFile;
 import com.example.yosef.shastore.model.components.FileObject;
 import com.example.yosef.shastore.model.components.RegularFile;
 import com.example.yosef.shastore.model.connectors.ByteCrypto;
+import com.example.yosef.shastore.model.connectors.ProfileManager;
 import com.example.yosef.shastore.model.util.InternalStorageHandler;
 import com.example.yosef.shastore.model.util.SharedPreferenceHandler;
 import com.example.yosef.shastore.setup.ShastoreApplication;
+import com.google.android.gms.vision.barcode.Barcode;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -57,6 +61,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -66,6 +72,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int CREATE_REQUEST_CODE = 40;
     private static final int ENCRYPT_REQUEST_CODE = 41;
     private static final int DECRYPT_REQUEST_CODE = 42;
+    private static final int REGISTER_DEVICE = 50;
 
     private static EditText plainFileName;
     private static EditText secureFileName;
@@ -153,6 +160,15 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
+    }
+
+    public void openRegistrationCameraActivity(View view) {
+        Intent intent = new Intent(this, RegistrationCameraActivity.class);
+        startActivityForResult(intent, REGISTER_DEVICE);
+    }
+
+    public boolean registerDevice(Device device) {
+        return AppDatabase.getDatabase().addDevice(device);
     }
 
     @Override
@@ -297,10 +313,8 @@ public class MainActivity extends AppCompatActivity {
 
         if (resultCode == Activity.RESULT_OK)
         {
-
             if (requestCode == ENCRYPT_REQUEST_CODE)
             {
-
                 if (resultData != null) {
                     currentUri = resultData.getData();
                     try {
@@ -314,7 +328,6 @@ public class MainActivity extends AppCompatActivity {
             }
             if (requestCode == DECRYPT_REQUEST_CODE)
             {
-
                 if (resultData != null) {
                     currentUri = resultData.getData();
                     try {
@@ -330,11 +343,9 @@ public class MainActivity extends AppCompatActivity {
             }
             if (requestCode == CREATE_REQUEST_CODE)
             {
-
                 if (resultData != null) {
                     currentUri = resultData.getData();
                     try {
-
                         if (action == "enc"){
                             Log.i(TAG, "Create a encrypted file");
                             doEncryption(plainFile, currentUri);
@@ -342,12 +353,55 @@ public class MainActivity extends AppCompatActivity {
                             Log.i(TAG, "Create a plain file");
                             doDecryption(secureFile, currentUri);
                         }
-
                         //secureFileName.setText(secureFile.getName());
                     } catch (Exception e) {
                         // Handle error here
                     }
                 }
+            }
+            if (requestCode == REGISTER_DEVICE) {
+                Barcode barcode = resultData.getParcelableExtra(RegistrationCameraActivity.BarcodeObject);
+
+                String passwordHash;
+                String newUUID;
+                String newDeviceKey;
+
+                boolean registered = false;
+
+                // parse barcode data
+                Pattern pattern = Pattern.compile("(p:)([^\\s]*)(\\s+)(id:)([^\\s]*)(\\s+)(k:)([^\\s]*)(\\s*)(.*)");
+                Matcher matcher = pattern.matcher(barcode.rawValue);
+
+                if (matcher.matches()) {
+                    passwordHash = matcher.group(2);
+                    newUUID = matcher.group(5);
+                    newDeviceKey = matcher.group(8);
+
+                    // create a new device
+                    Device newDevice = null;
+
+                    // validate the passwordHash
+                    ProfileManager profileManager = new ProfileManager();
+                    String username = SharedPreferenceHandler.getSharedPrefsCurrentUserSettings(this).getString(SharedPreferenceHandler.SHARED_PREFS_CURRENT_PROFILE_USERNAME, null);
+                    if (profileManager.authenticateProfile(username, passwordHash)) {
+                        newDevice = new Device();
+                        newDevice.setUUID(newUUID);
+                        newDevice.setKey(newDeviceKey);
+                    }
+
+                    // register the new device to database
+                    if ((newDevice != null) && registerDevice(newDevice)) {
+                        registered = true;
+                    }
+                }
+
+                String toast;
+                if (!registered) {
+                    toast = "Device Registration is unsuccessful";
+                } else {
+                    toast = "Device Registration is successful";
+                }
+                Toast.makeText(this, toast, Toast.LENGTH_LONG).show();
             }
         }
     }
