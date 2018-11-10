@@ -33,9 +33,10 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class ByteCrypto {
     private  static byte[] IV;
+
     public static String key2Str(SecretKey key){
         try{
-            return new String(key.getEncoded(), "UTF-8");
+            return Base64.encodeToString(key.getEncoded(), Base64.DEFAULT);
         } catch (Exception e){
             return "";
         }
@@ -44,29 +45,21 @@ public class ByteCrypto {
 
     public static SecretKey str2Key(String str){
         try{
-            byte[] strB = str.getBytes("UTF-8");
+            byte[] strB = Base64.decode(str, Base64.DEFAULT);
             return new SecretKeySpec(strB, 0, strB.length, "AES");
         }catch (Exception e){
             return null;
         }
     }
 
-    public static String generateRandKey(){
+    public static SecretKey generateRandKey(){
         try{
             KeyGenerator keyGen = KeyGenerator.getInstance("AES");
             keyGen.init(256);
-            SecretKey newK = keyGen.generateKey();
-            byte[] arr = new byte[]{118, -37, 38, 74, -70, -58, -14, -110, 94, 118, -5, -112, 60, -4, -76, 125};
-//            Log.i("!!!!!!!", Arrays.toString(newK.getEncoded()));
-//            Log.i("!!!!!!!", key2Str(newK).length() + "");
-//            Log.i("!!!!!!!", Arrays.toString(key2Str(newK).getBytes("UTF-8")));
-            String newS = Base64.encodeToString(arr, Base64.DEFAULT);
-            Log.i("!!!!!!!!", newS);
-            Log.i("!!!!!!!!",Arrays.toString(Base64.decode(newS, Base64.DEFAULT)));
-            return ByteCrypto.key2Str(newK);
+            return keyGen.generateKey();
         } catch (Exception e){
             Log.e("In Device", e.toString());
-            return "";
+            return null;
         }
     }
 

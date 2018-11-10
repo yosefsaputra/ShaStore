@@ -125,7 +125,7 @@ public class LoginActivity extends AppCompatActivity {
         String nowId = deviceManager.generateUUID(mDeviceNameView.getText().toString());
         Log.i("!!!!!!!", nowId);
         if (!deviceManager.isKnown(nowId)){
-            Device newD = new Device(nowId, ByteCrypto.generateRandKey());
+            Device newD = new Device(nowId, ByteCrypto.key2Str(ByteCrypto.generateRandKey()));
 
         }
     }
