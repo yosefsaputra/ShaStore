@@ -88,6 +88,10 @@ public abstract class AppDatabase extends RoomDatabase {
         return fileDbDao().getFileDb(fileId);
     }
 
+    public boolean addDevice(Device device) {
+        return deviceDbDao().insert(DeviceConverter.toDeviceDb(device)) != 0;
+    }
+
     public void resetDatabase() {
         profileDbDao().deleteAllProfileDbs();
         deviceDbDao().deleteAllDeviceDbs();

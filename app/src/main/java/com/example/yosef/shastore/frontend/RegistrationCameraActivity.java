@@ -49,7 +49,6 @@ import com.example.yosef.shastore.frontend.camera.CameraSourcePreview;
 import com.example.yosef.shastore.frontend.camera.GraphicOverlay;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
-import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
@@ -246,12 +245,10 @@ public class RegistrationCameraActivity extends AppCompatActivity implements Bar
 
     @Override
     public void onBarcodeDetected(Barcode barcode) {
-        System.out.println(barcode.displayValue);
     }
 
     @Override
     public void onPointerCaptureChanged(boolean hasCapture) {
-
     }
 
     /**
@@ -291,7 +288,7 @@ public class RegistrationCameraActivity extends AppCompatActivity implements Bar
         if (best != null) {
             Intent data = new Intent();
             data.putExtra(BarcodeObject, best);
-            setResult(CommonStatusCodes.SUCCESS, data);
+            setResult(Activity.RESULT_OK, data);
             finish();
             return true;
         }
