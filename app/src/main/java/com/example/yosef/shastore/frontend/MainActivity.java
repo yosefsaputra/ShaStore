@@ -403,6 +403,10 @@ public class MainActivity extends AppCompatActivity {
                 saveFile();
             }else{
                 //TODO: @Yosef you shuold implement device B code here;
+                // Here you can use the secureFile to access the encrypted file user chose.
+                // In the secureFile the fileId is the id of the file, and the cipherKey is the fileKey after encryption.
+                // the fileId is (DeviceId+T+Time) in Base64String. So the last character of fileId maybe random.
+
             }
 
         } catch (IOException e){
