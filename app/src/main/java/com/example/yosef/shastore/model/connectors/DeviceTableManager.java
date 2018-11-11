@@ -22,7 +22,6 @@ package com.example.yosef.shastore.model.connectors;
 
 import com.example.yosef.shastore.database.AppDatabase;
 import com.example.yosef.shastore.model.components.Device;
-import com.example.yosef.shastore.model.components.Profile;
 
 public class DeviceTableManager {
     static int UUIDLength = 25;

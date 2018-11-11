@@ -47,6 +47,7 @@ import com.example.yosef.shastore.model.components.EncryptedFile;
 import com.example.yosef.shastore.model.components.FileObject;
 import com.example.yosef.shastore.model.components.RegularFile;
 import com.example.yosef.shastore.model.connectors.ByteCrypto;
+import com.example.yosef.shastore.model.connectors.FileTableManager;
 import com.example.yosef.shastore.model.connectors.ProfileManager;
 import com.example.yosef.shastore.model.util.InternalStorageHandler;
 import com.example.yosef.shastore.model.util.SharedPreferenceHandler;
@@ -232,13 +233,19 @@ public class MainActivity extends AppCompatActivity {
         }
         return "";
     }
+
     private void doEncryption(FileObject plainFile, Uri secureUri)  {
         try{
-            KeyGenerator keygen = KeyGenerator.getInstance("AES");
-            keygen.init(256);
-            savedKey = keygen.generateKey();
+            SecretKey nowKey = ByteCrypto.generateRandKey();
+
             secureFile = new EncryptedFile();
-            byte[] cipherText = ByteCrypto.encryptByte(plainFile.getContent(), savedKey);
+            byte[] cipherText = ByteCrypto.encryptByte(plainFile.getContent(), nowKey);
+            secureFile.setContent(cipherText);
+            secureFile.setFileKey(nowKey);
+            secureFile.setFileId(EncryptedFile.generateFileId(ShastoreApplication.instanceId));
+
+            new FileTableManager().saveFile(secureFile);
+            // add head
             ParcelFileDescriptor pfd =
                     this.getContentResolver().
                             openFileDescriptor(secureUri, "w");
@@ -246,12 +253,10 @@ public class MainActivity extends AppCompatActivity {
             FileOutputStream fileOutputStream =
                     new FileOutputStream(pfd.getFileDescriptor());
 
-            secureFile.setContent(cipherText);
+
             secureFile.writeContent(fileOutputStream);
             pfd.close();
             Log.d(TAG, "Saving encrypted file" );
-        } catch (NoSuchAlgorithmException e){
-
         } catch (IOException e) {
             Log.e(TAG, "Cannot open file " + secureUri.toString());
         }

@@ -20,11 +20,32 @@
 
 package com.example.yosef.shastore.model.components;
 
+import javax.crypto.SecretKey;
+
 public class EncryptedFile extends FileObject {
+
+    private String fileId;
+    private SecretKey fileKey;
+    public static String generateFileId(String deviceId){
+        long mills = System.currentTimeMillis();
+        String secs = Long.toString(mills);
+        return deviceId+"T"+ secs;
+    }
+    public void setFileId(String fileId){
+        this.fileId = fileId;
+    }
+    public void setFileKey(SecretKey fileKey){
+        this.fileKey = fileKey;
+    }
+    public String getFileId() {return fileId;}
+    public SecretKey getFileKey() {return fileKey;}
+
     public EncryptedFile(){
         name = "";
         content = null;
     }
+
+
     public EncryptedFile(String name)
     {
         this.name = name;
