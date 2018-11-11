@@ -198,55 +198,6 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
         fileName = findViewById(R.id.fileName);
     }
-    public void newFile(View view)
-    {
-        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
-
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        //intent.setType("text/plain");
-        intent.setType("*/*");
-        intent.putExtra(Intent.EXTRA_TITLE, "newfile.txt");
-
-        startActivityForResult(intent, CREATE_REQUEST_CODE);
-    }
-
-    private void writeFileContent(Uri uri)
-    {
-        try{
-            ParcelFileDescriptor pfd =
-                    this.getContentResolver().
-                            openFileDescriptor(uri, "w");
-
-            FileOutputStream fileOutputStream =
-                    new FileOutputStream(pfd.getFileDescriptor());
-
-            String textContent = fileName.getText().toString();
-
-            fileOutputStream.write(textContent.getBytes());
-
-            fileOutputStream.close();
-            pfd.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    private String readFileContent(Uri uri) throws IOException {
-
-        InputStream inputStream =
-                getContentResolver().openInputStream(uri);
-        BufferedReader reader =
-                new BufferedReader(new InputStreamReader(
-                        inputStream));
-        StringBuilder stringBuilder = new StringBuilder();
-        String currentline;
-        while ((currentline = reader.readLine()) != null) {
-            stringBuilder.append(currentline + "\n");
-        }
-        inputStream.close();
-        return stringBuilder.toString();
-    }
 
     private void readFileFromUri(Uri uri, FileObject newFile) throws IOException{
         Cursor cursor = getContentResolver()
@@ -333,38 +284,10 @@ public class MainActivity extends AppCompatActivity {
 
         if (resultCode == Activity.RESULT_OK)
         {
-            if (requestCode == CHOOSE_FILE){
+            if (requestCode == CHOOSE_FILE) {
                 if (resultData != null) {
                     currentUri = resultData.getData();
                     fileName.setText(getFileNameFromUri(currentUri));
-                }
-            }
-            if (requestCode == ENCRYPT_REQUEST_CODE)
-            {
-                if (resultData != null) {
-                    currentUri = resultData.getData();
-                    try {
-                        readFileFromUri(currentUri, plainFile);
-                        fileName.setText(plainFile.getName());
-                        action = "enc";
-                    } catch (Exception e) {
-                        // Handle error here
-                    }
-                }
-            }
-            if (requestCode == DECRYPT_REQUEST_CODE)
-            {
-                if (resultData != null) {
-                    currentUri = resultData.getData();
-                    try {
-                        readFileFromUri(currentUri, secureFile);
-                        fileName.setText(secureFile.getName());
-                        action = "dec";
-                        //Toast.makeText(this, new String(secureFile.getContent()), Toast.LENGTH_LONG).show();
-                        Log.i(TAG, "Open secure file !!!!!! " + new String(secureFile.getContent()));
-                    } catch (Exception e) {
-                        // Handle error here
-                    }
                 }
             }
             if (requestCode == CREATE_REQUEST_CODE)
@@ -431,25 +354,6 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-//    public void decryptFile(View view)
-//    {
-//        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-//        intent.addCategory(Intent.CATEGORY_OPENABLE);
-//        //intent.setType("text/plain");
-//        intent.setType("*/*");
-//        intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-//        startActivityForResult(intent, DECRYPT_REQUEST_CODE);
-//    }
-//
-//    public void encryptFile(View view)
-//    {
-//        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-//        intent.addCategory(Intent.CATEGORY_OPENABLE);
-//        intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-//        intent.setType("*/*");
-//        startActivityForResult(intent, ENCRYPT_REQUEST_CODE);
-//    }
-
     public void saveFile(){
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
