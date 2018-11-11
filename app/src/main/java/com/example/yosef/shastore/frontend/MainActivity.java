@@ -47,6 +47,7 @@ import com.example.yosef.shastore.model.components.EncryptedFile;
 import com.example.yosef.shastore.model.components.FileObject;
 import com.example.yosef.shastore.model.components.RegularFile;
 import com.example.yosef.shastore.model.connectors.ByteCrypto;
+import com.example.yosef.shastore.model.connectors.DeviceTableManager;
 import com.example.yosef.shastore.model.connectors.FileTableManager;
 import com.example.yosef.shastore.model.connectors.ProfileManager;
 import com.example.yosef.shastore.model.util.InternalStorageHandler;
@@ -243,9 +244,15 @@ public class MainActivity extends AppCompatActivity {
             secureFile.setContent(cipherText);
             secureFile.setFileKey(nowKey);
             secureFile.setFileId(EncryptedFile.generateFileId(ShastoreApplication.instanceId));
+            SecretKey deviceKey = new DeviceTableManager().getKey(ShastoreApplication.instanceId);
+            //Log.i("!!!!!!!!", ByteCrypto.key2Str(deviceKey));
 
+            byte[] cipherKey = ByteCrypto.encryptByte(nowKey.getEncoded(), deviceKey);
+            secureFile.setCipherKey(cipherKey);
             new FileTableManager().saveFile(secureFile);
+
             // add head
+
             ParcelFileDescriptor pfd =
                     this.getContentResolver().
                             openFileDescriptor(secureUri, "w");
@@ -256,19 +263,21 @@ public class MainActivity extends AppCompatActivity {
 
             secureFile.writeContent(fileOutputStream);
             pfd.close();
-            Log.d(TAG, "Saving encrypted file" );
+            Toast.makeText(this, "Saved encrypted file to cloud", Toast.LENGTH_LONG).show();
         } catch (IOException e) {
             Log.e(TAG, "Cannot open file " + secureUri.toString());
         }
 
     }
 
-    private void doDecryption(FileObject secureFile, Uri plainUri){
+    private void doDecryption(EncryptedFile secureFile, Uri plainUri){
         try{
 //            DocumentsContract.deleteDocument(getContentResolver(), plainUri);
 //            return;
+
             plainFile = new RegularFile();
-            byte[] plainText = ByteCrypto.decryptByte(secureFile.getContent(), savedKey);
+
+            byte[] plainText = ByteCrypto.decryptByte(secureFile.getContent(), secureFile.getFileKey());
             ParcelFileDescriptor pfd = this.getContentResolver().
                             openFileDescriptor(plainUri, "w");
 
@@ -389,7 +398,13 @@ public class MainActivity extends AppCompatActivity {
         try{
             readFileFromUri(currentUri, secureFile);
             action = "dec";
-            saveFile();
+            secureFile.setFileKey(new FileTableManager().getFileKey(secureFile.getFileId()));
+            if (secureFile.getFileKey() != null){
+                saveFile();
+            }else{
+                //TODO: @Yosef you shuold implement device B code here;
+            }
+
         } catch (IOException e){
             Log.e(TAG, "File IO Exception");
         }

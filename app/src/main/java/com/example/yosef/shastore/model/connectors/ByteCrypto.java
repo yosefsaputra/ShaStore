@@ -32,10 +32,11 @@ public class ByteCrypto {
     private  static byte[] IV;
     private static String TAG = ByteCrypto.class.getSimpleName();
     public static String byte2Str(byte[] bytes){
-        return Base64.encodeToString(bytes, Base64.DEFAULT);
+        return Base64.encodeToString(bytes, Base64.NO_WRAP|Base64.NO_PADDING);
     }
 
     public static byte[] str2Byte(String str){
+
         return Base64.decode(str, Base64.DEFAULT);
     }
     public static String key2Str(SecretKey key){

@@ -20,6 +20,8 @@
 
 package com.example.yosef.shastore.model.components;
 
+import android.net.Uri;
+
 public class RegularFile extends FileObject {
 
     public RegularFile(){

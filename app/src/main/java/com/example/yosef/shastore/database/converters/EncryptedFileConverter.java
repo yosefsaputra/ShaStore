@@ -6,6 +6,7 @@ import com.example.yosef.shastore.model.connectors.ByteCrypto;
 
 public class EncryptedFileConverter {
     public static FileDb toFileDb(EncryptedFile file){
+        if (file == null) return null;
         FileDb newF =new  FileDb();
         newF.setFileId(file.getFileId());
         newF.setFileKey(ByteCrypto.key2Str(file.getFileKey()));
@@ -13,6 +14,7 @@ public class EncryptedFileConverter {
     }
 
     public static EncryptedFile toEncFile(FileDb file){
+        if (file == null) return null;
         EncryptedFile newF =new EncryptedFile();
         newF.setFileId(file.getFileId());
         newF.setFileKey(ByteCrypto.str2Key(file.getFileKey()));

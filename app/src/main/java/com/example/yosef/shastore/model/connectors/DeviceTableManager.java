@@ -23,6 +23,8 @@ package com.example.yosef.shastore.model.connectors;
 import com.example.yosef.shastore.database.AppDatabase;
 import com.example.yosef.shastore.model.components.Device;
 
+import javax.crypto.SecretKey;
+
 public class DeviceTableManager {
     static int UUIDLength = 25;
 //    public String generateUUID(String name){
@@ -33,10 +35,10 @@ public class DeviceTableManager {
 //
 //        return uuid + more;
 //    }
-    public boolean isKnown(String uuid){
+    public SecretKey getKey(String uuid){
         Device prev = AppDatabase.getDatabase().getDevicebyId(uuid);
-        if (prev == null) return false;
-            else return true;
+        if (prev == null) return null;
+            else return ByteCrypto.str2Key(prev.getKey());
     }
     public boolean saveDevice(String uuid, String key){
         Device newD = new Device(uuid, key);
