@@ -46,6 +46,10 @@ public class ShastoreApplication extends Application {
     private void initialization() {
         Context appContext = getApplicationContext();
 
+        // Initialize Database
+        AppDatabase.initializeDatabase(appContext);
+        Log.i(TAG, AppDatabase.getDatabase().toString());
+
         // Check the instance ID
         boolean instanceIdCheck = checkInstanceId();
 
@@ -54,10 +58,6 @@ public class ShastoreApplication extends Application {
             createInstanceId();
         }
         Log.i(TAG, String.format("INSTANCE ID : %s", readInstanceId()));
-
-        // Initialize Database
-        AppDatabase.initializeDatabase(appContext);
-        Log.i(TAG, AppDatabase.getDatabase().toString());
     }
 
     private boolean checkInstanceId() {
