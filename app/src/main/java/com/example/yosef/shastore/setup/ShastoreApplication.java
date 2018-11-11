@@ -25,9 +25,10 @@ import android.content.Context;
 import android.util.Log;
 
 import com.example.yosef.shastore.database.AppDatabase;
+import com.example.yosef.shastore.model.components.Device;
+import com.example.yosef.shastore.model.connectors.ByteCrypto;
 import com.example.yosef.shastore.model.util.InternalStorageHandler;
 
-import java.io.UnsupportedEncodingException;
 import java.util.UUID;
 
 public class ShastoreApplication extends Application {
@@ -64,16 +65,16 @@ public class ShastoreApplication extends Application {
     }
 
     private boolean createInstanceId() {
-        return InternalStorageHandler.createFile(getApplicationContext(), FILE_NAME_INSTANCE_ID, UUID.randomUUID().toString().getBytes());
+        String instanceId = UUID.randomUUID().toString();
+
+        boolean res1 = AppDatabase.getDatabase().addDevice(new Device(instanceId, ByteCrypto.key2Str(ByteCrypto.generateRandKey())));
+        boolean res2 = InternalStorageHandler.createFile(getApplicationContext(), FILE_NAME_INSTANCE_ID, ByteCrypto.str2Byte(instanceId));
+
+        return res1 && res2;
     }
 
     private String readInstanceId() {
-        try {
-            return new String(InternalStorageHandler.readFile(getApplicationContext(), FILE_NAME_INSTANCE_ID, new byte[16]), "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            return null;
-        }
+        return ByteCrypto.byte2Str(InternalStorageHandler.readFile(getApplicationContext(), FILE_NAME_INSTANCE_ID, new byte[16]));
     }
 
     @Override

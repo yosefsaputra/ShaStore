@@ -24,7 +24,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -32,14 +31,8 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.example.yosef.shastore.R;
-import com.example.yosef.shastore.model.components.Device;
-import com.example.yosef.shastore.model.connectors.ByteCrypto;
-import com.example.yosef.shastore.model.connectors.DeviceTableManager;
 import com.example.yosef.shastore.model.connectors.ProfileManager;
 import com.example.yosef.shastore.model.util.SharedPreferenceHandler;
-
-import java.lang.reflect.Array;
-import java.util.Arrays;
 
 /**
  * A login screen that offers login via email/password.
@@ -118,15 +111,6 @@ public class LoginActivity extends AppCompatActivity {
             finish();
         } else {
             Toast.makeText(this, String.format("Authentication unsuccessful %s", mUsernameView.getText().toString()), Toast.LENGTH_LONG).show();
-        }
-
-
-        DeviceTableManager deviceManager = new DeviceTableManager();
-        String nowId = deviceManager.generateUUID(mDeviceNameView.getText().toString());
-        Log.i("!!!!!!!", nowId);
-        if (!deviceManager.isKnown(nowId)){
-            Device newD = new Device(nowId, ByteCrypto.key2Str(ByteCrypto.generateRandKey()));
-
         }
     }
 }
