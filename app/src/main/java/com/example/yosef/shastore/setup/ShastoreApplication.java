@@ -36,6 +36,8 @@ public class ShastoreApplication extends Application {
 
     public static String FILE_NAME_INSTANCE_ID = "instanceid";
 
+    public static String instanceId;
+
     @Override
     public void onCreate() {
         super.onCreate();
@@ -57,15 +59,25 @@ public class ShastoreApplication extends Application {
         if (!instanceIdCheck) {
             createInstanceId();
         }
+
+        instanceId = readInstanceId();
+
         Log.i(TAG, String.format("INSTANCE ID : %s", readInstanceId()));
     }
 
     private boolean checkInstanceId() {
-        return InternalStorageHandler.checkFile(getApplicationContext(), FILE_NAME_INSTANCE_ID);
+        boolean res1 = InternalStorageHandler.checkFile(getApplicationContext(), FILE_NAME_INSTANCE_ID);
+        if (!res1) {
+            return false;
+        }
+
+        return !(AppDatabase.getDatabase().getDevicebyId(readInstanceId()) == null);
     }
 
     private boolean createInstanceId() {
-        String instanceId = UUID.randomUUID().toString();
+        String instanceId = UUID.randomUUID().toString().replace("-", "");
+
+        Log.i(TAG, String.format("Instance ID - create - String: %s", instanceId));
 
         boolean res1 = AppDatabase.getDatabase().addDevice(new Device(instanceId, ByteCrypto.key2Str(ByteCrypto.generateRandKey())));
         boolean res2 = InternalStorageHandler.createFile(getApplicationContext(), FILE_NAME_INSTANCE_ID, ByteCrypto.str2Byte(instanceId));
@@ -74,7 +86,7 @@ public class ShastoreApplication extends Application {
     }
 
     private String readInstanceId() {
-        return ByteCrypto.byte2Str(InternalStorageHandler.readFile(getApplicationContext(), FILE_NAME_INSTANCE_ID, new byte[16]));
+        return ByteCrypto.byte2Str(InternalStorageHandler.readFile(getApplicationContext(), FILE_NAME_INSTANCE_ID)).replaceAll("\n", "");
     }
 
     @Override

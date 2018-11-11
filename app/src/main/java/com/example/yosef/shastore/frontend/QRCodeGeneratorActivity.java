@@ -51,6 +51,7 @@ public class QRCodeGeneratorActivity extends AppCompatActivity {
 
         if (passwordHash == null || deviceUniqueId == null || deviceKey == null) {
             Toast.makeText(this, "Invalid QR code", Toast.LENGTH_LONG).show();
+            finish();
         } else {
             ImageView qrcode_imageview = findViewById(R.id.qrcode_imageview);
             qrcode_imageview.setImageBitmap(generateQrCode(passwordHash, deviceUniqueId, deviceKey));

@@ -23,9 +23,6 @@ package com.example.yosef.shastore.model.connectors;
 import android.util.Base64;
 import android.util.Log;
 
-
-import java.util.Arrays;
-
 import javax.crypto.Cipher;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;

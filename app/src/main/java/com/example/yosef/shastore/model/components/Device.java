@@ -56,4 +56,13 @@ public class Device {
     public void setKey(String key) {
         this.key = key;
     }
+
+    @Override
+    public String toString() {
+        return "Device{" +
+                "name='" + name + '\'' +
+                ", UUID='" + UUID + '\'' +
+                ", key='" + key + '\'' +
+                '}';
+    }
 }

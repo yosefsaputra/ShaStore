@@ -21,13 +21,20 @@
 package com.example.yosef.shastore.model.util;
 
 import android.content.Context;
+import android.util.Log;
 
+import com.example.yosef.shastore.model.connectors.ByteCrypto;
+
+import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Arrays;
 
 public class InternalStorageHandler {
+    private static final String TAG = InternalStorageHandler.class.getSimpleName();
+
     public static boolean checkFile(Context context, String filename) {
         try {
             context.openFileInput(filename);
@@ -39,8 +46,11 @@ public class InternalStorageHandler {
 
     public static boolean createFile(Context context, String filename, byte[] contentBytes) {
         try {
+            Log.i(TAG, Arrays.toString(contentBytes));
+            Log.i(TAG, ByteCrypto.byte2Str(contentBytes));
             FileOutputStream outputStream = context.openFileOutput(filename, Context.MODE_PRIVATE);
             outputStream.write(contentBytes);
+            outputStream.flush();
             outputStream.close();
             return true;
         } catch (Exception e) {
@@ -49,14 +59,29 @@ public class InternalStorageHandler {
         }
     }
 
-    public static byte[] readFile(Context context, String filename, byte[] contentBytes) {
+    public static byte[] readFile(Context context, String filename) {
         try {
+            ByteArrayOutputStream byteBuffer = new ByteArrayOutputStream();
+
             FileInputStream fileInputStream = context.openFileInput(filename);
-            fileInputStream.read(contentBytes);
-            return contentBytes;
+//            fileInputStream.read(contentBytes);
+//            fileInputStream.close();
+
+            byte[] buffer = new byte[1024];
+            int len = 0;
+            while ((len = fileInputStream.read(buffer)) != -1) {
+                byteBuffer.write(buffer, 0, len);
+            }
+            fileInputStream.close();
+
+            return byteBuffer.toByteArray();
         } catch (IOException e) {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public static boolean deleteFile(Context context, String filename) {
+        return context.deleteFile(filename);
     }
 }

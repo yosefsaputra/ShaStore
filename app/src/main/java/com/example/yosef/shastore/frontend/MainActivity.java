@@ -59,8 +59,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -124,21 +124,25 @@ public class MainActivity extends AppCompatActivity {
                                 )
                         ).getPasswordHash();
 
-                        String instanceId = null;
+                        String instanceId = ShastoreApplication.instanceId;
+                        String deviceKey = null;
                         try {
-                            instanceId = new String(InternalStorageHandler.readFile(getApplicationContext(), ShastoreApplication.FILE_NAME_INSTANCE_ID, new byte[16]), "UTF-8");
-                        } catch (UnsupportedEncodingException e) {
-                            e.printStackTrace();
+                            deviceKey = AppDatabase.getDatabase().getDevicebyId(instanceId).getKey();
+                        } catch (NullPointerException e) {
                         }
+
+                        Log.i(TAG, instanceId);
+                        Log.i(TAG, deviceKey);
 
                         intent.putExtra(QRCodeGeneratorActivity.PASSWORD_HASH_INTENT_EXTRA, passwordHash);
                         intent.putExtra(QRCodeGeneratorActivity.DEVICE_UNIQUE_ID_INTENT_EXTRA, instanceId);
-                        intent.putExtra(QRCodeGeneratorActivity.DEVICE_KEY_INTENT_EXTRA, instanceId);
+                        intent.putExtra(QRCodeGeneratorActivity.DEVICE_KEY_INTENT_EXTRA, deviceKey);
                         startActivity(intent);
                         break;
                     }
                     case R.id.debug_reset_database: {
                         AppDatabase.getDatabase().resetDatabase();
+                        InternalStorageHandler.deleteFile(getApplicationContext(), ShastoreApplication.FILE_NAME_INSTANCE_ID);
                     }
                     case R.id.menu_sign_out: {
                         SharedPreferenceHandler.getSharedPrefsEditorCurrentUserSettings(getApplicationContext()).putString(SharedPreferenceHandler.SHARED_PREFS_CURRENT_PROFILE_USERNAME, null).apply();
@@ -152,6 +156,9 @@ public class MainActivity extends AppCompatActivity {
                         for (String string : databaseStrings) {
                             Log.i(TAG, string);
                         }
+                        Log.i(TAG, String.format("Instance ID length - internal - byte[] : %s", InternalStorageHandler.readFile(getApplicationContext(), ShastoreApplication.FILE_NAME_INSTANCE_ID)));
+                        Log.i(TAG, String.format("Instance ID - internal - byte[] : %s", Arrays.toString(InternalStorageHandler.readFile(getApplicationContext(), ShastoreApplication.FILE_NAME_INSTANCE_ID))));
+                        Log.i(TAG, String.format("Instance ID - internal - String : %s", ByteCrypto.byte2Str(InternalStorageHandler.readFile(getApplicationContext(), ShastoreApplication.FILE_NAME_INSTANCE_ID))));
                         break;
                     }
                     default: {
