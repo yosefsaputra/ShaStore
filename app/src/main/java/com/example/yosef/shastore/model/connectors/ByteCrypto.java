@@ -30,7 +30,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class ByteCrypto {
     private  static byte[] IV;
-
+    private static String TAG = ByteCrypto.class.getSimpleName();
     public static String byte2Str(byte[] bytes){
         return Base64.encodeToString(bytes, Base64.DEFAULT);
     }
@@ -69,7 +69,7 @@ public class ByteCrypto {
             cipher.init(Cipher.ENCRYPT_MODE, fileKey);
             return cipher.doFinal(plainText);
         } catch (Exception e){
-            Log.e("", "In encryptByte: " + e.toString());
+            Log.e(TAG, "In encryptByte: " + e.toString());
             return null;
         }
     }
@@ -81,7 +81,7 @@ public class ByteCrypto {
             cipher.init(Cipher.DECRYPT_MODE, fileKey);
             return cipher.doFinal(cipherText);
         } catch (Exception e){
-            Log.e("!!!!!!", "In decryptByte: " + e.toString());
+            Log.e(TAG, "In decryptByte: " + e.toString());
             return null;
         }
     }

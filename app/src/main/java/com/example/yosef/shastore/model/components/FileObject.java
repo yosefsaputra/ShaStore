@@ -61,7 +61,7 @@ public abstract class FileObject {
         content = byteBuffer.toByteArray();
     }
     public void writeContent(OutputStream outputStream) throws IOException {
-        Log.d(TAG, "writing to file content:" + new String(content));
+        //Log.d(TAG, "writing to file content:" + new String(content));
         outputStream.write(content);
         outputStream.flush();
         outputStream.close();
