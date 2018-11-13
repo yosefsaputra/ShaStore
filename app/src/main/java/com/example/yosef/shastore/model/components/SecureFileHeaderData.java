@@ -27,6 +27,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SecureFileHeaderData implements Parcelable {
+    public static final String TAG = SecureFileHeaderData.class.getSimpleName();
+
     public static final Creator<SecureFileHeaderData> CREATOR = new Creator<SecureFileHeaderData>() {
         @Override
         public SecureFileHeaderData createFromParcel(Parcel in) {
@@ -42,6 +44,9 @@ public class SecureFileHeaderData implements Parcelable {
     private String cipherKey;
 
     protected SecureFileHeaderData(Parcel in) {
+    }
+
+    public SecureFileHeaderData() {
     }
 
     public SecureFileHeaderData(String fileId, String cipherKey) {
@@ -68,16 +73,16 @@ public class SecureFileHeaderData implements Parcelable {
 
 
     public String toQRCodeString() {
-        return String.format("fid:%s ck:%s", fileId, cipherKey);
+        return String.format("a:%s fid:%s ck:%s", TAG, fileId, cipherKey);
     }
 
     public boolean toSecureFileHeaderData(String rawValue) {
-        Pattern pattern = Pattern.compile("(fid:)([^\\s]*)(\\s+)(ck:)([^\\s]*)(\\s*)(.*)");
+        Pattern pattern = Pattern.compile("(a:SecureFileHeaderData)(\\s+)(fid:)([^\\s]*)(\\s+)(ck:)([^\\s]*)(\\s*)(.*)");
         Matcher matcher = pattern.matcher(rawValue);
 
         if (matcher.matches()) {
-            fileId = matcher.group(2);
-            cipherKey = matcher.group(5);
+            fileId = matcher.group(4);
+            cipherKey = matcher.group(7);
             return true;
         } else {
             return false;

@@ -311,7 +311,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             if (requestCode == REGISTER_DEVICE) {
-                DeviceRegistrationData deviceRegistrationData = resultData.getParcelableExtra(RegistrationCameraActivity.DEVICE_REGISTRATION_DATA);
+                DeviceRegistrationData deviceRegistrationData = resultData.getParcelableExtra(RegistrationCameraActivity.DATA);
 
                 boolean registered = false;
 
