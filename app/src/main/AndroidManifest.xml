@@ -47,7 +47,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".frontend.QRCodeGeneratorActivity" />
+        <activity android:name=".frontend.DeviceRegistrationQRCodeActivity" />
         <activity android:name=".frontend.RegistrationConfirmationActivity" />
         <activity android:name=".frontend.RegistrationCameraActivity" />
         <activity android:name=".frontend.RegisteredDevicesActivity" />

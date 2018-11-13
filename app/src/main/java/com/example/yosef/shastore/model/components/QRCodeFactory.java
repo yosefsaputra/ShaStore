@@ -18,53 +18,20 @@
  * IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  */
 
-package com.example.yosef.shastore.frontend;
+package com.example.yosef.shastore.model.components;
 
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-import android.widget.ImageView;
-import android.widget.Toast;
 
-import com.example.yosef.shastore.R;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.WriterException;
 import com.google.zxing.common.BitMatrix;
 import com.google.zxing.qrcode.QRCodeWriter;
 
-public class QRCodeGeneratorActivity extends AppCompatActivity {
-    public static String PASSWORD_HASH_INTENT_EXTRA = "PASSWORD_HASH_INTENT_EXTRA";
-    public static String DEVICE_UNIQUE_ID_INTENT_EXTRA = "DEVICE_UNIQUE_ID_INTENT_EXTRA";
-    public static String DEVICE_KEY_INTENT_EXTRA = "DEVICE_KEY_INTENT_EXTRA";
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_registration_camera);
-
-        Intent intent = getIntent();
-        String passwordHash = intent.getStringExtra(PASSWORD_HASH_INTENT_EXTRA);
-        String deviceUniqueId = intent.getStringExtra(DEVICE_UNIQUE_ID_INTENT_EXTRA);
-        String deviceKey = intent.getStringExtra(DEVICE_KEY_INTENT_EXTRA);
-
-        if (passwordHash == null || deviceUniqueId == null || deviceKey == null) {
-            Toast.makeText(this, "Invalid QR code", Toast.LENGTH_LONG).show();
-            finish();
-        } else {
-            ImageView qrcode_imageview = findViewById(R.id.qrcode_imageview);
-            qrcode_imageview.setImageBitmap(generateQrCode(passwordHash, deviceUniqueId, deviceKey));
-        }
-    }
-
-    protected Bitmap generateQrCode(String passwordHash, String deviceUniqueId, String deviceKey) {
+public class QRCodeFactory {
+    public Bitmap generate(String text) {
         QRCodeWriter qrCodeWriter = new QRCodeWriter();
-        String text = String.format("p:%s id:%s k:%s",
-                passwordHash,
-                deviceUniqueId,
-                deviceKey
-        );
+
         try {
             BitMatrix bitMatrix = qrCodeWriter.encode(text, BarcodeFormat.QR_CODE, 350, 350);
 

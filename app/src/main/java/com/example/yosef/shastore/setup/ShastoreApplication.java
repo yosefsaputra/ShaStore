@@ -77,8 +77,6 @@ public class ShastoreApplication extends Application {
     private boolean createInstanceId() {
         String instanceId = UUID.randomUUID().toString().replace("-", "");
 
-        Log.i(TAG, String.format("Instance ID - create - String: %s", instanceId));
-
         boolean res1 = AppDatabase.getDatabase().addDevice(new Device(instanceId, ByteCrypto.key2Str(ByteCrypto.generateRandKey())));
         boolean res2 = InternalStorageHandler.createFile(getApplicationContext(), FILE_NAME_INSTANCE_ID, ByteCrypto.str2Byte(instanceId));
 
