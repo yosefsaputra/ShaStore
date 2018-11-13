@@ -43,7 +43,7 @@ public class EncryptedFile extends FileObject {
     public static String generateFileId(String deviceId){
         long mills = System.currentTimeMillis();
         String secs = Long.toString(mills);
-        String fileid = deviceId + "#T#" + secs;
+        String fileid = deviceId + "T" + secs;
         //To use the fileId, make the fileId to a Base64 String!!!
         fileid = ByteCrypto.byte2Str(ByteCrypto.str2Byte(fileid));
         return fileid;
@@ -56,6 +56,17 @@ public class EncryptedFile extends FileObject {
     }
     public String getFileId() {return fileId;}
     public SecretKey getFileKey() {return fileKey;}
+
+    public static String getDeviceId(String fileId) {
+        Pattern pattern = Pattern.compile("(.+)(T)(.+)");
+        Matcher matcher = pattern.matcher(fileId);
+
+        if (matcher.matches()) {
+            return matcher.group(1);
+        } else {
+            return null;
+        }
+    }
     public void setCipherKey(byte[] cipherKey) {this.cipherKey = cipherKey;}
 
 
@@ -106,14 +117,7 @@ public class EncryptedFile extends FileObject {
         content = Arrays.copyOfRange(fileContent, headerLength, fileContent.length);
     }
 
-    public static String getDeviceId(String fileId) {
-        Pattern pattern = Pattern.compile("(.+)(#T#)(.+)");
-        Matcher matcher = pattern.matcher(fileId);
-
-        if (matcher.matches()) {
-            return matcher.group(1);
-        } else {
-            return null;
-        }
+    public byte[] getCipherKey() {
+        return cipherKey;
     }
 }

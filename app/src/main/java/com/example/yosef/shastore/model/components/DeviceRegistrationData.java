@@ -27,6 +27,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class DeviceRegistrationData implements Parcelable {
+    public static final String TAG = DeviceRegistrationData.class.getSimpleName();
+
     public static final Creator<DeviceRegistrationData> CREATOR = new Creator<DeviceRegistrationData>() {
         @Override
         public DeviceRegistrationData createFromParcel(Parcel in) {
@@ -91,7 +93,8 @@ public class DeviceRegistrationData implements Parcelable {
     }
 
     public String toQRCodeString() {
-        return String.format("p:%s id:%s k:%s",
+        return String.format("a:%s p:%s id:%s k:%s",
+                TAG,
                 passwordHash,
                 deviceUniqueId,
                 deviceKey
@@ -99,13 +102,13 @@ public class DeviceRegistrationData implements Parcelable {
     }
 
     public boolean toDeviceRegistrationData(String rawValue) {
-        Pattern pattern = Pattern.compile("(p:)([^\\s]*)(\\s+)(id:)([^\\s]*)(\\s+)(k:)([^\\s]*)(\\s*)(.*)");
+        Pattern pattern = Pattern.compile("(a:DeviceRegistrationData)(\\s+)(p:)([^\\s]*)(\\s+)(id:)([^\\s]*)(\\s+)(k:)([^\\s]*)(\\s*)(.*)");
         Matcher matcher = pattern.matcher(rawValue);
 
         if (matcher.matches()) {
-            passwordHash = matcher.group(2);
-            deviceUniqueId = matcher.group(5);
-            deviceKey = matcher.group(8);
+            passwordHash = matcher.group(4);
+            deviceUniqueId = matcher.group(7);
+            deviceKey = matcher.group(10);
 
             return true;
         } else {
