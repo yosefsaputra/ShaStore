@@ -55,16 +55,10 @@ import com.example.yosef.shastore.model.util.InternalStorageHandler;
 import com.example.yosef.shastore.model.util.SharedPreferenceHandler;
 import com.example.yosef.shastore.setup.ShastoreApplication;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 
-import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 
 public class MainActivity extends AppCompatActivity {
@@ -154,9 +148,6 @@ public class MainActivity extends AppCompatActivity {
                         for (String string : databaseStrings) {
                             Log.i(TAG, string);
                         }
-                        Log.i(TAG, String.format("Instance ID length - internal - byte[] : %s", InternalStorageHandler.readFile(getApplicationContext(), ShastoreApplication.FILE_NAME_INSTANCE_ID)));
-                        Log.i(TAG, String.format("Instance ID - internal - byte[] : %s", Arrays.toString(InternalStorageHandler.readFile(getApplicationContext(), ShastoreApplication.FILE_NAME_INSTANCE_ID))));
-                        Log.i(TAG, String.format("Instance ID - internal - String : %s", ByteCrypto.byte2Str(InternalStorageHandler.readFile(getApplicationContext(), ShastoreApplication.FILE_NAME_INSTANCE_ID))));
                         break;
                     }
                     default: {
