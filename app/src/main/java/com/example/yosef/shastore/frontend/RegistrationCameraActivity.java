@@ -47,6 +47,7 @@ import com.example.yosef.shastore.frontend.camera.BarcodeTrackerFactory;
 import com.example.yosef.shastore.frontend.camera.CameraSource;
 import com.example.yosef.shastore.frontend.camera.CameraSourcePreview;
 import com.example.yosef.shastore.frontend.camera.GraphicOverlay;
+import com.example.yosef.shastore.model.components.DeviceRegistrationData;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.vision.MultiProcessor;
@@ -58,7 +59,8 @@ import java.io.IOException;
 public class RegistrationCameraActivity extends AppCompatActivity implements BarcodeGraphicTracker.BarcodeUpdateListener {
     private static final String TAG = RegistrationCameraActivity.class.getSimpleName();
 
-    public static final String BarcodeObject = "Barcode";
+    // public static final String BarcodeObject = "Barcode";
+    public static final String DEVICE_REGISTRATION_DATA = "DEVICE_REGISTRATION_DATA";
     // intent request code to handle updating play services if needed.
     private static final int RC_HANDLE_GMS = 9001;
     // permission request codes need to be < 256
@@ -286,9 +288,14 @@ public class RegistrationCameraActivity extends AppCompatActivity implements Bar
         }
 
         if (best != null) {
-            Intent data = new Intent();
-            data.putExtra(BarcodeObject, best);
-            setResult(Activity.RESULT_OK, data);
+            Intent intent = new Intent();
+            // data.putExtra(BarcodeObject, best);
+
+            DeviceRegistrationData data = new DeviceRegistrationData();
+            data.toDeviceRegistrationData(best.rawValue);
+
+            intent.putExtra(DEVICE_REGISTRATION_DATA, data);
+            setResult(Activity.RESULT_OK, intent);
             finish();
             return true;
         }

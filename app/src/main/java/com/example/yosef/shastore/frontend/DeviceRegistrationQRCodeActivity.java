@@ -21,20 +21,16 @@
 package com.example.yosef.shastore.frontend;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.yosef.shastore.R;
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.WriterException;
-import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.QRCodeWriter;
+import com.example.yosef.shastore.model.components.DeviceRegistrationData;
+import com.example.yosef.shastore.model.components.QRCodeFactory;
 
-public class QRCodeGeneratorActivity extends AppCompatActivity {
+public class DeviceRegistrationQRCodeActivity extends AppCompatActivity {
     public static String PASSWORD_HASH_INTENT_EXTRA = "PASSWORD_HASH_INTENT_EXTRA";
     public static String DEVICE_UNIQUE_ID_INTENT_EXTRA = "DEVICE_UNIQUE_ID_INTENT_EXTRA";
     public static String DEVICE_KEY_INTENT_EXTRA = "DEVICE_KEY_INTENT_EXTRA";
@@ -54,35 +50,15 @@ public class QRCodeGeneratorActivity extends AppCompatActivity {
             finish();
         } else {
             ImageView qrcode_imageview = findViewById(R.id.qrcode_imageview);
-            qrcode_imageview.setImageBitmap(generateQrCode(passwordHash, deviceUniqueId, deviceKey));
-        }
-    }
 
-    protected Bitmap generateQrCode(String passwordHash, String deviceUniqueId, String deviceKey) {
-        QRCodeWriter qrCodeWriter = new QRCodeWriter();
-        String text = String.format("p:%s id:%s k:%s",
-                passwordHash,
-                deviceUniqueId,
-                deviceKey
-        );
-        try {
-            BitMatrix bitMatrix = qrCodeWriter.encode(text, BarcodeFormat.QR_CODE, 350, 350);
+            DeviceRegistrationData data = new DeviceRegistrationData();
+            data.setPasswordHash(passwordHash);
+            data.setDeviceUniqueId(deviceUniqueId);
+            data.setDeviceKey(deviceKey);
 
-            Bitmap bitmap = Bitmap.createBitmap(
-                    bitMatrix.getWidth(),
-                    bitMatrix.getHeight(),
-                    Bitmap.Config.RGB_565
-            );
-            for (int x = 0; x < bitMatrix.getWidth(); x++) {
-                for (int y = 0; y < bitMatrix.getHeight(); y++) {
-                    bitmap.setPixel(x, y, bitMatrix.get(x, y) ? Color.BLACK : Color.WHITE);
-                }
-            }
+            QRCodeFactory qrCodeFactory = new QRCodeFactory();
 
-            return bitmap;
-        } catch (WriterException e) {
-            e.printStackTrace();
-            return null;
+            qrcode_imageview.setImageBitmap(qrCodeFactory.generate(data.toQRCodeString()));
         }
     }
 }

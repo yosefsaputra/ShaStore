@@ -43,6 +43,7 @@ import android.widget.Toast;
 import com.example.yosef.shastore.R;
 import com.example.yosef.shastore.database.AppDatabase;
 import com.example.yosef.shastore.model.components.Device;
+import com.example.yosef.shastore.model.components.DeviceRegistrationData;
 import com.example.yosef.shastore.model.components.EncryptedFile;
 import com.example.yosef.shastore.model.components.FileObject;
 import com.example.yosef.shastore.model.components.RegularFile;
@@ -51,7 +52,6 @@ import com.example.yosef.shastore.model.connectors.ProfileManager;
 import com.example.yosef.shastore.model.util.InternalStorageHandler;
 import com.example.yosef.shastore.model.util.SharedPreferenceHandler;
 import com.example.yosef.shastore.setup.ShastoreApplication;
-import com.google.android.gms.vision.barcode.Barcode;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -61,8 +61,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
@@ -115,7 +113,7 @@ public class MainActivity extends AppCompatActivity {
                         break;
                     }
                     case R.id.menu_qrcode: {
-                        Intent intent = new Intent(getApplicationContext(), QRCodeGeneratorActivity.class);
+                        Intent intent = new Intent(getApplicationContext(), DeviceRegistrationQRCodeActivity.class);
 
                         String passwordHash = AppDatabase.getDatabase().getProfile(
                                 SharedPreferenceHandler.getSharedPrefsCurrentUserSettings(getApplicationContext()).getString(
@@ -131,12 +129,9 @@ public class MainActivity extends AppCompatActivity {
                         } catch (NullPointerException e) {
                         }
 
-                        Log.i(TAG, instanceId);
-                        Log.i(TAG, deviceKey);
-
-                        intent.putExtra(QRCodeGeneratorActivity.PASSWORD_HASH_INTENT_EXTRA, passwordHash);
-                        intent.putExtra(QRCodeGeneratorActivity.DEVICE_UNIQUE_ID_INTENT_EXTRA, instanceId);
-                        intent.putExtra(QRCodeGeneratorActivity.DEVICE_KEY_INTENT_EXTRA, deviceKey);
+                        intent.putExtra(DeviceRegistrationQRCodeActivity.PASSWORD_HASH_INTENT_EXTRA, passwordHash);
+                        intent.putExtra(DeviceRegistrationQRCodeActivity.DEVICE_UNIQUE_ID_INTENT_EXTRA, instanceId);
+                        intent.putExtra(DeviceRegistrationQRCodeActivity.DEVICE_KEY_INTENT_EXTRA, deviceKey);
                         startActivity(intent);
                         break;
                     }
@@ -367,39 +362,39 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             if (requestCode == REGISTER_DEVICE) {
-                Barcode barcode = resultData.getParcelableExtra(RegistrationCameraActivity.BarcodeObject);
+                DeviceRegistrationData deviceRegistrationData = resultData.getParcelableExtra(RegistrationCameraActivity.DEVICE_REGISTRATION_DATA);
 
-                String passwordHash;
-                String newUUID;
-                String newDeviceKey;
+//                String passwordHash;
+//                String newUUID;
+//                String newDeviceKey;
 
                 boolean registered = false;
 
-                // parse barcode data
-                Pattern pattern = Pattern.compile("(p:)([^\\s]*)(\\s+)(id:)([^\\s]*)(\\s+)(k:)([^\\s]*)(\\s*)(.*)");
-                Matcher matcher = pattern.matcher(barcode.rawValue);
+//                // parse barcode data
+//                Pattern pattern = Pattern.compile("(p:)([^\\s]*)(\\s+)(id:)([^\\s]*)(\\s+)(k:)([^\\s]*)(\\s*)(.*)");
+//                Matcher matcher = pattern.matcher(barcode.rawValue);
+//
+//                if (matcher.matches()) {
+//                    passwordHash = matcher.group(2);
+//                    newUUID = matcher.group(5);
+//                    newDeviceKey = matcher.group(8);
 
-                if (matcher.matches()) {
-                    passwordHash = matcher.group(2);
-                    newUUID = matcher.group(5);
-                    newDeviceKey = matcher.group(8);
 
-                    // create a new device
-                    Device newDevice = null;
+                // create a new device
+                Device newDevice = null;
 
-                    // validate the passwordHash
-                    ProfileManager profileManager = new ProfileManager();
-                    String username = SharedPreferenceHandler.getSharedPrefsCurrentUserSettings(this).getString(SharedPreferenceHandler.SHARED_PREFS_CURRENT_PROFILE_USERNAME, null);
-                    if (profileManager.authenticateProfile(username, passwordHash)) {
-                        newDevice = new Device();
-                        newDevice.setUUID(newUUID);
-                        newDevice.setKey(newDeviceKey);
-                    }
+                // validate the passwordHash
+                ProfileManager profileManager = new ProfileManager();
+                String username = SharedPreferenceHandler.getSharedPrefsCurrentUserSettings(this).getString(SharedPreferenceHandler.SHARED_PREFS_CURRENT_PROFILE_USERNAME, null);
+                if (profileManager.authenticateProfile(username, deviceRegistrationData.getPasswordHash())) {
+                    newDevice = new Device();
+                    newDevice.setUUID(deviceRegistrationData.getDeviceUniqueId());
+                    newDevice.setKey(deviceRegistrationData.getDeviceKey());
+                }
 
-                    // register the new device to database
-                    if ((newDevice != null) && registerDevice(newDevice)) {
-                        registered = true;
-                    }
+                // register the new device to database
+                if ((newDevice != null) && registerDevice(newDevice)) {
+                    registered = true;
                 }
 
                 String toast;
