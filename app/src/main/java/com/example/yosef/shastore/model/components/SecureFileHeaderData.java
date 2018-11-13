@@ -39,12 +39,14 @@ public class SecureFileHeaderData implements Parcelable {
         }
     };
     private String fileId;
+    private String cipherKey;
 
     protected SecureFileHeaderData(Parcel in) {
     }
 
-    public SecureFileHeaderData(String fileId) {
+    public SecureFileHeaderData(String fileId, String cipherKey) {
         this.fileId = fileId;
+        this.cipherKey = cipherKey;
     }
 
     public String getFileId() {
@@ -64,26 +66,37 @@ public class SecureFileHeaderData implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
     }
 
-    @Override
-    public String toString() {
-        return "SecureFileHeaderData{" +
-                "fileId='" + fileId + '\'' +
-                '}';
-    }
 
     public String toQRCodeString() {
-        return String.format("fid: %s", fileId);
+        return String.format("fid:%s ck:%s", fileId, cipherKey);
     }
 
     public boolean toSecureFileHeaderData(String rawValue) {
-        Pattern pattern = Pattern.compile("(fid:)([^\\s]*)(\\s*)(.*)");
+        Pattern pattern = Pattern.compile("(fid:)([^\\s]*)(\\s+)(ck:)([^\\s]*)(\\s*)(.*)");
         Matcher matcher = pattern.matcher(rawValue);
 
         if (matcher.matches()) {
             fileId = matcher.group(2);
+            cipherKey = matcher.group(5);
             return true;
         } else {
             return false;
         }
+    }
+
+    public String getCipherKey() {
+        return cipherKey;
+    }
+
+    public void setCipherKey(String cipherKey) {
+        this.cipherKey = cipherKey;
+    }
+
+    @Override
+    public String toString() {
+        return "SecureFileHeaderData{" +
+                "fileId='" + fileId + '\'' +
+                ", cipherKey='" + cipherKey + '\'' +
+                '}';
     }
 }

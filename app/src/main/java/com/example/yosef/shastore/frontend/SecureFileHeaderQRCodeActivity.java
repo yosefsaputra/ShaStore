@@ -20,21 +20,36 @@
 
 package com.example.yosef.shastore.frontend;
 
+import android.app.Activity;
 import android.content.Intent;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.DocumentsContract;
+import android.provider.OpenableColumns;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.yosef.shastore.R;
+import com.example.yosef.shastore.model.components.FileObject;
 import com.example.yosef.shastore.model.components.QRCodeFactory;
+import com.example.yosef.shastore.model.components.RegularFile;
 import com.example.yosef.shastore.model.components.SecureFileHeaderData;
+import com.example.yosef.shastore.model.connectors.ByteCrypto;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 public class SecureFileHeaderQRCodeActivity extends AppCompatActivity {
     private static final String TAG = SecureFileHeaderQRCodeActivity.class.getSimpleName();
-    public static String ACTION_INTENT_EXTRA = "ACTION_INTENT_EXTRA";
-    public static String FILE_ID_INTENT_EXTRA = "FILE_ID_HEADER_INTENT_EXTRA";
+    public static final String ACTION_INTENT_EXTRA = "ACTION_INTENT_EXTRA";
+    public static final String FILE_ID_INTENT_EXTRA = "FILE_ID_INTENT_EXTRA";
+    public static final String FILE_CIPHER_KEY_INTENT_EXTRA = "FILE_CIPHER_KEY_INTENT_EXTRA";
+    public static final String FILE_HEADER_RETURN_INTENT_EXTRA = "FILE_HEADER_RETURN_INTENT_EXTRA";
+    private static final int CHOOSE_FILE = 41;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,22 +58,73 @@ public class SecureFileHeaderQRCodeActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         String action = intent.getStringExtra(ACTION_INTENT_EXTRA);
-        String secureFileHeader = intent.getStringExtra(FILE_ID_INTENT_EXTRA);
+        String secureFileId = intent.getStringExtra(FILE_ID_INTENT_EXTRA);
+        String secureFileCipherKey = ByteCrypto.byte2Str(intent.getByteArrayExtra(FILE_CIPHER_KEY_INTENT_EXTRA));
 
         Log.d(TAG, "action: " + action);
-        Log.d(TAG, "secureFileHeader: " + secureFileHeader);
+        Log.d(TAG, "secureFileId: " + secureFileId);
+        Log.d(TAG, "secureFileCipherKey: " + secureFileCipherKey);
 
-        if (!action.equals("GET_FILE_KEY") || secureFileHeader == null) {
+        if (!action.equals("GET_FILE_HEADER") || secureFileId == null || secureFileCipherKey == null) {
             Toast.makeText(this, "Invalid QR code", Toast.LENGTH_LONG).show();
             finish();
         } else {
             ImageView qrcode_imageview = findViewById(R.id.securefileheaderqrcode_imageview);
 
-            SecureFileHeaderData data = new SecureFileHeaderData(secureFileHeader);
+            SecureFileHeaderData data = new SecureFileHeaderData(secureFileId, secureFileCipherKey);
 
             QRCodeFactory qrCodeFactory = new QRCodeFactory();
 
             qrcode_imageview.setImageBitmap(qrCodeFactory.generate(data.toQRCodeString()));
         }
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode,
+                                 Intent resultData) {
+        if (resultCode == Activity.RESULT_OK) {
+            if (requestCode == CHOOSE_FILE) {
+                if (resultData != null) {
+                    FileObject txte = new RegularFile();
+                    try {
+                        readFileFromUri(resultData.getData(), txte);
+                        DocumentsContract.deleteDocument(getContentResolver(), resultData.getData());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    Intent intent = new Intent();
+                    intent.putExtra(FILE_HEADER_RETURN_INTENT_EXTRA, txte.getContent());
+                    setResult(Activity.RESULT_OK, intent);
+                    finish();
+                }
+            }
+        }
+    }
+
+    private void readFileFromUri(Uri uri, FileObject newFile) throws IOException {
+        Cursor cursor = getContentResolver()
+                .query(uri, null, null, null, null, null);
+        try {
+            if (cursor != null && cursor.moveToFirst()) {
+                String displayName = cursor.getString(
+                        cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                Log.i(TAG, "Display Name: " + displayName);
+                newFile.setName(displayName);
+            }
+        } finally {
+            cursor.close();
+        }
+        InputStream inputStream = getContentResolver().openInputStream(uri);
+        newFile.readContent(inputStream);
+    }
+
+    public void chooseFile(View view) {
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        //intent.setType("text/plain");
+        intent.setType("*/*");
+        intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        startActivityForResult(intent, CHOOSE_FILE);
     }
 }
