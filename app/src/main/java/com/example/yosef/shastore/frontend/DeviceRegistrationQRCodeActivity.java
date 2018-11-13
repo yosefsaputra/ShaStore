@@ -31,6 +31,7 @@ import com.example.yosef.shastore.model.components.DeviceRegistrationData;
 import com.example.yosef.shastore.model.components.QRCodeFactory;
 
 public class DeviceRegistrationQRCodeActivity extends AppCompatActivity {
+    public static String ACTION_INTENT_EXTRA = "ACTION_INTENT_EXTRA";
     public static String PASSWORD_HASH_INTENT_EXTRA = "PASSWORD_HASH_INTENT_EXTRA";
     public static String DEVICE_UNIQUE_ID_INTENT_EXTRA = "DEVICE_UNIQUE_ID_INTENT_EXTRA";
     public static String DEVICE_KEY_INTENT_EXTRA = "DEVICE_KEY_INTENT_EXTRA";
