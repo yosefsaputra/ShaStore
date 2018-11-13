@@ -275,6 +275,7 @@ public class MainActivity extends AppCompatActivity {
             plainFile.writeContent(fileOutputStream);
             pfd.close();
             Log.d(TAG,"Saving plain file ");
+            Toast.makeText(this, "Saved plain file to local storage", Toast.LENGTH_LONG).show();
         } catch (IOException e) {
             Log.e(TAG, "Cannot open file " + plainUri.toString());
         }
@@ -398,12 +399,16 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 Log.i(TAG, "Device ID: " + deviceId);
-                if ((AppDatabase.getDatabase().deviceDbDao().getDeviceById(deviceId) != null)) {
+                Device thisDevice =AppDatabase.getDatabase().getDevicebyId(deviceId);
+                if ( thisDevice!= null) {
                     // TODO : implement
                     // 1. Get the device key from database based on device id
                     // 2. Decrypt file header with device key
                     // 3. Get the fileKey
                     // 4. saveFile()
+                    SecretKey deviceKey = ByteCrypto.str2Key(thisDevice.getKey());
+                    secureFile.setFileKey(ByteCrypto.byte2key(ByteCrypto.decryptByte(secureFile.getCipherKey(), deviceKey)));
+                    saveFile();
                 } else {
                     // Create QR Code to send file header with a button
                     Intent intent = new Intent(this, SecureFileHeaderQRCodeActivity.class);

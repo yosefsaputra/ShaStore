@@ -52,6 +52,13 @@ public class ByteCrypto {
         }
     }
 
+    public static SecretKey byte2key(byte[] strB){
+        try{
+            return new SecretKeySpec(strB, 0, strB.length, "AES");
+        }catch (Exception e){
+            return null;
+        }
+    }
     public static SecretKey generateRandKey(){
         try{
             KeyGenerator keyGen = KeyGenerator.getInstance("AES");
