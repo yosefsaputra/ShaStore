@@ -265,7 +265,7 @@ public class MainActivity extends AppCompatActivity {
 //            DocumentsContract.deleteDocument(getContentResolver(), plainUri);
 //            return;
 
-            RegularFile regularFile = new RegularFile();
+            EncryptedFile encryptedFile = new EncryptedFile();
 
             Device device = AppDatabase.getDatabase().getDevicebyId(EncryptedFile.getDeviceId(secureFileHeaderData.getFileId()));
 
@@ -284,20 +284,24 @@ public class MainActivity extends AppCompatActivity {
             }
             SecretKey requestDeviceKey = ByteCrypto.str2Key(requestDevice.getKey());
             byte[] encryptedFileKey = ByteCrypto.encryptByte(fileKey, requestDeviceKey);
-            byte[] fileId = ByteCrypto.str2Byte(secureFileHeaderData.getFileId());
+            String fileId = secureFileHeaderData.getFileId();
 
-            byte[] content = new byte[fileId.length + encryptedFileKey.length];
-            System.arraycopy(fileId, 0, content, 0, fileId.length);
-            System.arraycopy(encryptedFileKey, 0, content, fileId.length, encryptedFileKey.length);
+            encryptedFile.setFileId(fileId);
+            encryptedFile.setCipherKey(encryptedFileKey);
+            encryptedFile.setContent(new byte[]{});
 
-            regularFile.setContent(content);
+//            byte[] content = new byte[fileId.length + encryptedFileKey.length];
+//            System.arraycopy(fileId, 0, content, 0, fileId.length);
+//            System.arraycopy(encryptedFileKey, 0, content, fileId.length, encryptedFileKey.length);
+//
+//            regularFile.setContent(content);
 
             ParcelFileDescriptor pfd = this.getContentResolver().
                     openFileDescriptor(uri, "w");
 
             FileOutputStream fileOutputStream =
                     new FileOutputStream(pfd.getFileDescriptor());
-            regularFile.writeContent(fileOutputStream);
+            encryptedFile.writeContent(fileOutputStream);
             pfd.close();
             Log.d(TAG, "Saving encryptedFileHeader file ");
             Toast.makeText(this, "Saved encryptedFileHeader file", Toast.LENGTH_LONG).show();

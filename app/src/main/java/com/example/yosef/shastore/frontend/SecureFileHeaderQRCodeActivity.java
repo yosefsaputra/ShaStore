@@ -34,6 +34,9 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.yosef.shastore.R;
+import com.example.yosef.shastore.database.AppDatabase;
+import com.example.yosef.shastore.model.components.Device;
+import com.example.yosef.shastore.model.components.EncryptedFile;
 import com.example.yosef.shastore.model.components.FileObject;
 import com.example.yosef.shastore.model.components.QRCodeFactory;
 import com.example.yosef.shastore.model.components.RegularFile;
@@ -86,7 +89,7 @@ public class SecureFileHeaderQRCodeActivity extends AppCompatActivity {
         if (resultCode == Activity.RESULT_OK) {
             if (requestCode == CHOOSE_FILE) {
                 if (resultData != null) {
-                    FileObject txte = new RegularFile();
+                    EncryptedFile txte = new EncryptedFile();
                     try {
                         readFileFromUri(resultData.getData(), txte);
                         DocumentsContract.deleteDocument(getContentResolver(), resultData.getData());
@@ -94,9 +97,20 @@ public class SecureFileHeaderQRCodeActivity extends AppCompatActivity {
                         e.printStackTrace();
                     }
 
-                    Intent intent = new Intent();
-                    intent.putExtra(FILE_HEADER_RETURN_INTENT_EXTRA, txte.getContent());
-                    setResult(Activity.RESULT_OK, intent);
+
+                    Device device = AppDatabase.getDatabase().getDevicebyId(ShastoreApplication.instanceId);
+
+                    if (device == null) {
+                        Toast.makeText(this, "Unregistered Device", Toast.LENGTH_LONG).show();
+                        return;
+                    }
+
+                    byte[] fileKey = ByteCrypto.decryptByte(txte.getCipherKey(), ByteCrypto.str2Key(device.getKey()));
+                    txte.setFileKey(ByteCrypto.byte2key(fileKey));
+                    AppDatabase.getDatabase().addEncFile(txte);
+                    Toast.makeText(this,"Saved file key to database", Toast.LENGTH_LONG).show();
+//                    Intent intent = new Intent();
+                    setResult(Activity.RESULT_OK);
                     finish();
                 }
             }
