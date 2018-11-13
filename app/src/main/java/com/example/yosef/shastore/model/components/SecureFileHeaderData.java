@@ -22,6 +22,7 @@ package com.example.yosef.shastore.model.components;
 
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.util.Log;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,6 +30,8 @@ import java.util.regex.Pattern;
 public class SecureFileHeaderData implements Parcelable {
     public static final String TAG = SecureFileHeaderData.class.getSimpleName();
 
+    private String fileId;
+    private String cipherKey;
     public static final Creator<SecureFileHeaderData> CREATOR = new Creator<SecureFileHeaderData>() {
         @Override
         public SecureFileHeaderData createFromParcel(Parcel in) {
@@ -40,18 +43,30 @@ public class SecureFileHeaderData implements Parcelable {
             return new SecureFileHeaderData[size];
         }
     };
-    private String fileId;
-    private String cipherKey;
-
-    protected SecureFileHeaderData(Parcel in) {
-    }
 
     public SecureFileHeaderData() {
     }
 
-    public SecureFileHeaderData(String fileId, String cipherKey) {
+    private String requestDeviceId;
+
+    public SecureFileHeaderData(String fileId, String cipherKey, String requestDeviceId) {
         this.fileId = fileId;
         this.cipherKey = cipherKey;
+        this.requestDeviceId = requestDeviceId;
+    }
+
+    protected SecureFileHeaderData(Parcel in) {
+        fileId = in.readString();
+        cipherKey = in.readString();
+        requestDeviceId = in.readString();
+    }
+
+    public String getRequestDeviceId() {
+        return requestDeviceId;
+    }
+
+    public void setRequestDeviceId(String requestDeviceId) {
+        this.requestDeviceId = requestDeviceId;
     }
 
     public String getFileId() {
@@ -69,20 +84,28 @@ public class SecureFileHeaderData implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(fileId);
+        dest.writeString(cipherKey);
+        dest.writeString(requestDeviceId);
     }
 
 
     public String toQRCodeString() {
-        return String.format("a:%s fid:%s ck:%s", TAG, fileId, cipherKey);
+        return String.format("a:%s fid:%s ck:%s rdid:%s", TAG, fileId, cipherKey, requestDeviceId);
     }
 
     public boolean toSecureFileHeaderData(String rawValue) {
-        Pattern pattern = Pattern.compile("(a:SecureFileHeaderData)(\\s+)(fid:)([^\\s]*)(\\s+)(ck:)([^\\s]*)(\\s*)(.*)");
+        Pattern pattern = Pattern.compile("(a:SecureFileHeaderData)(\\s+)(fid:)([^\\s]*)(\\s+)(ck:)([^\\s]*)(\\s+)(rdid:)([^\\s]*)(\\s*)(.*)");
         Matcher matcher = pattern.matcher(rawValue);
 
         if (matcher.matches()) {
+            Log.i("!!", "matches");
+            Log.i("!!", matcher.group(4));
+            Log.i("!!", matcher.group(7));
+            Log.i("!!", matcher.group(10));
             fileId = matcher.group(4);
             cipherKey = matcher.group(7);
+            requestDeviceId = matcher.group(10);
             return true;
         } else {
             return false;
@@ -102,6 +125,7 @@ public class SecureFileHeaderData implements Parcelable {
         return "SecureFileHeaderData{" +
                 "fileId='" + fileId + '\'' +
                 ", cipherKey='" + cipherKey + '\'' +
+                ", requestDeviceId='" + requestDeviceId + '\'' +
                 '}';
     }
 }

@@ -26,6 +26,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.ParcelFileDescriptor;
+import android.os.Parcelable;
 import android.provider.OpenableColumns;
 import android.support.constraint.ConstraintLayout;
 import android.support.design.widget.NavigationView;
@@ -47,6 +48,7 @@ import com.example.yosef.shastore.model.components.DeviceRegistrationData;
 import com.example.yosef.shastore.model.components.EncryptedFile;
 import com.example.yosef.shastore.model.components.FileObject;
 import com.example.yosef.shastore.model.components.RegularFile;
+import com.example.yosef.shastore.model.components.SecureFileHeaderData;
 import com.example.yosef.shastore.model.connectors.ByteCrypto;
 import com.example.yosef.shastore.model.connectors.DeviceTableManager;
 import com.example.yosef.shastore.model.connectors.FileTableManager;
@@ -78,6 +80,7 @@ public class MainActivity extends AppCompatActivity {
     private RegularFile plainFile = new RegularFile();
     private EncryptedFile secureFile = new EncryptedFile();
     private String action = "null";
+    private SecureFileHeaderData secureFileHeaderData = new SecureFileHeaderData();
 
     private ConstraintLayout layout;
     private DrawerLayout drawerLayout;
@@ -255,7 +258,52 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             Log.e(TAG, "Cannot open file " + secureUri.toString());
         }
+    }
 
+    private void doUploadSecureHeader(SecureFileHeaderData secureFileHeaderData, Uri uri) {
+        try {
+//            DocumentsContract.deleteDocument(getContentResolver(), plainUri);
+//            return;
+
+            RegularFile regularFile = new RegularFile();
+
+            Device device = AppDatabase.getDatabase().getDevicebyId(EncryptedFile.getDeviceId(secureFileHeaderData.getFileId()));
+
+            if (device == null) {
+                Toast.makeText(this, "Unregistered Device", Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            SecretKey deviceKey = ByteCrypto.str2Key(device.getKey());
+            byte[] fileKey = ByteCrypto.decryptByte(ByteCrypto.str2Byte(secureFileHeaderData.getCipherKey()), deviceKey);
+            Device requestDevice = AppDatabase.getDatabase().getDevicebyId(EncryptedFile.getDeviceId(secureFileHeaderData.getFileId()));
+
+            if (requestDevice == null) {
+                Toast.makeText(this, "Unregistered Request Device", Toast.LENGTH_LONG).show();
+                return;
+            }
+            SecretKey requestDeviceKey = ByteCrypto.str2Key(requestDevice.getKey());
+            byte[] encryptedFileKey = ByteCrypto.encryptByte(fileKey, requestDeviceKey);
+            byte[] fileId = ByteCrypto.str2Byte(secureFileHeaderData.getFileId());
+
+            byte[] content = new byte[fileId.length + encryptedFileKey.length];
+            System.arraycopy(fileId, 0, content, 0, fileId.length);
+            System.arraycopy(encryptedFileKey, 0, content, fileId.length, encryptedFileKey.length);
+
+            regularFile.setContent(content);
+
+            ParcelFileDescriptor pfd = this.getContentResolver().
+                    openFileDescriptor(uri, "w");
+
+            FileOutputStream fileOutputStream =
+                    new FileOutputStream(pfd.getFileDescriptor());
+            regularFile.writeContent(fileOutputStream);
+            pfd.close();
+            Log.d(TAG, "Saving encryptedFileHeader file ");
+            Toast.makeText(this, "Saved encryptedFileHeader file", Toast.LENGTH_LONG).show();
+        } catch (IOException e) {
+            Log.e(TAG, "Cannot open file " + uri.toString());
+        }
     }
 
     private void doDecryption(EncryptedFile secureFile, Uri plainUri){
@@ -301,9 +349,12 @@ public class MainActivity extends AppCompatActivity {
                         if (action == "enc"){
                             Log.i(TAG, "Create a encrypted file");
                             doEncryption(plainFile, currentUri);
-                        }else{
+                        } else if (action == "dec") {
                             Log.i(TAG, "Create a plain file");
                             doDecryption(secureFile, currentUri);
+                        } else if (action == "upload header") {
+                            Log.i(TAG, "Upload a secure header file");
+                            doUploadSecureHeader(secureFileHeaderData, currentUri);
                         }
                         //secureFileName.setText(secureFile.getName());
                     } catch (Exception e) {
@@ -312,45 +363,73 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             if (requestCode == REGISTER_DEVICE) {
-                DeviceRegistrationData deviceRegistrationData = resultData.getParcelableExtra(RegistrationCameraActivity.DATA);
+                Parcelable data = resultData.getParcelableExtra(RegistrationCameraActivity.DATA);
 
-                boolean registered = false;
+                if (data instanceof DeviceRegistrationData) {
+                    DeviceRegistrationData deviceRegistrationData = (DeviceRegistrationData) data;
 
-                // create a new device
-                Device newDevice = null;
+                    boolean registered = false;
 
-                // validate the passwordHash
-                ProfileManager profileManager = new ProfileManager();
-                String username = SharedPreferenceHandler.getSharedPrefsCurrentUserSettings(this).getString(SharedPreferenceHandler.SHARED_PREFS_CURRENT_PROFILE_USERNAME, null);
-                if (profileManager.authenticateProfile(username, deviceRegistrationData.getPasswordHash())) {
-                    newDevice = new Device();
-                    newDevice.setUUID(deviceRegistrationData.getDeviceUniqueId());
-                    newDevice.setKey(deviceRegistrationData.getDeviceKey());
-                }
+                    // create a new device
+                    Device newDevice = null;
 
-                // register the new device to database
-                if ((newDevice != null) && registerDevice(newDevice)) {
-                    registered = true;
-                }
+                    // validate the passwordHash
+                    ProfileManager profileManager = new ProfileManager();
+                    String username = SharedPreferenceHandler.getSharedPrefsCurrentUserSettings(this).getString(SharedPreferenceHandler.SHARED_PREFS_CURRENT_PROFILE_USERNAME, null);
+                    if (profileManager.authenticateProfile(username, deviceRegistrationData.getPasswordHash())) {
+                        newDevice = new Device();
+                        newDevice.setUUID(deviceRegistrationData.getDeviceUniqueId());
+                        newDevice.setKey(deviceRegistrationData.getDeviceKey());
+                    }
 
-                String toast;
-                if (!registered) {
-                    toast = "Device Registration is unsuccessful";
+                    // register the new device to database
+                    if ((newDevice != null) && registerDevice(newDevice)) {
+                        registered = true;
+                    }
+
+                    String toast;
+                    if (!registered) {
+                        toast = "Device Registration is unsuccessful";
+                    } else {
+                        toast = "Device Registration is successful";
+                    }
+                    Toast.makeText(this, toast, Toast.LENGTH_LONG).show();
+                } else if (data instanceof SecureFileHeaderData) {
+                    secureFileHeaderData = (SecureFileHeaderData) data;
+
+                    action = "upload header";
+
+                    Log.i(TAG, "SecureFileHeaderData");
+                    Log.i(TAG, secureFileHeaderData.toString());
+
+                    saveFile();
                 } else {
-                    toast = "Device Registration is successful";
+                    Toast.makeText(this, "Unknown QR Code Format", Toast.LENGTH_LONG).show();
                 }
-                Toast.makeText(this, toast, Toast.LENGTH_LONG).show();
             }
 
             if (requestCode == GET_FILE_HEADER) {
-                Log.i(TAG, ByteCrypto.byte2Str(resultData.getByteArrayExtra(SecureFileHeaderQRCodeActivity.FILE_HEADER_RETURN_INTENT_EXTRA)));
-                // TODO: implement
-                // 1. Decrypt the file header with current device key
-                // 2. Get the fileKey
-                // 3. Put the filekey to the database
+                doDecryptSecureHeader(resultData.getByteArrayExtra(SecureFileHeaderQRCodeActivity.FILE_HEADER_RETURN_INTENT_EXTRA));
             }
         }
     }
+
+    private void doDecryptSecureHeader(byte[] content) {
+        // TODO: implement
+        // 1. Decrypt the file header with current device key
+        // 2. Get the fileKey
+        Device device = AppDatabase.getDatabase().getDevicebyId(ShastoreApplication.instanceId);
+
+        if (device == null) {
+            Toast.makeText(this, "Unregistered Device", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        byte[] fileKey = ByteCrypto.decryptByte(content, ByteCrypto.str2Key(device.getKey()));
+
+        // 3. Put the filekey to the database
+    }
+
     public void saveFile(){
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -399,7 +478,7 @@ public class MainActivity extends AppCompatActivity {
                 }
 
                 Log.i(TAG, "Device ID: " + deviceId);
-                Device thisDevice =AppDatabase.getDatabase().getDevicebyId(deviceId);
+                Device thisDevice = AppDatabase.getDatabase().getDevicebyId(deviceId);
                 if ( thisDevice!= null) {
                     // TODO : implement
                     // 1. Get the device key from database based on device id

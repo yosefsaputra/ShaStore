@@ -39,6 +39,7 @@ import com.example.yosef.shastore.model.components.QRCodeFactory;
 import com.example.yosef.shastore.model.components.RegularFile;
 import com.example.yosef.shastore.model.components.SecureFileHeaderData;
 import com.example.yosef.shastore.model.connectors.ByteCrypto;
+import com.example.yosef.shastore.setup.ShastoreApplication;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -71,7 +72,7 @@ public class SecureFileHeaderQRCodeActivity extends AppCompatActivity {
         } else {
             ImageView qrcode_imageview = findViewById(R.id.securefileheaderqrcode_imageview);
 
-            SecureFileHeaderData data = new SecureFileHeaderData(secureFileId, secureFileCipherKey);
+            SecureFileHeaderData data = new SecureFileHeaderData(secureFileId, secureFileCipherKey, ShastoreApplication.instanceId);
 
             QRCodeFactory qrCodeFactory = new QRCodeFactory();
 
