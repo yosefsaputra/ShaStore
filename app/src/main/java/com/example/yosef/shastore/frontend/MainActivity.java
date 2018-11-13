@@ -387,7 +387,7 @@ public class MainActivity extends AppCompatActivity {
                 // the fileId is (DeviceId+T+Time) in Base64String. So the last character of fileId maybe random.
 
                 String deviceId = EncryptedFile.getDeviceId(secureFile.getFileId());
-                if (deviceId != null) {
+                if (deviceId == null) {
                     Toast.makeText(this, "Invalid ShaStore File", Toast.LENGTH_LONG).show();
                     return;
                 }
