@@ -26,8 +26,10 @@ import android.arch.persistence.room.RoomDatabase;
 import android.content.Context;
 
 import com.example.yosef.shastore.database.converters.DeviceConverter;
+import com.example.yosef.shastore.database.converters.EncryptedFileConverter;
 import com.example.yosef.shastore.database.converters.ProfileConverter;
 import com.example.yosef.shastore.model.components.Device;
+import com.example.yosef.shastore.model.components.EncryptedFile;
 import com.example.yosef.shastore.model.components.Profile;
 
 import java.util.List;
@@ -79,6 +81,13 @@ public abstract class AppDatabase extends RoomDatabase {
         return ProfileConverter.toProfile(profileDbDao().getProfileDb(username));
     }
 
+    public EncryptedFile getEncFile(String fileId){
+        return EncryptedFileConverter.toEncFile(fileDbDao().getFileDb(fileId));
+    }
+
+    public boolean addEncFile(EncryptedFile file){
+        return fileDbDao().insert(EncryptedFileConverter.toFileDb(file)) != 0;
+    }
     public boolean addProfile(Profile profile) {
         return profileDbDao().insert(ProfileConverter.toProfileDb(profile)) != 0;
     }

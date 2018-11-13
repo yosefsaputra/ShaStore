@@ -48,6 +48,8 @@ import com.example.yosef.shastore.model.components.EncryptedFile;
 import com.example.yosef.shastore.model.components.FileObject;
 import com.example.yosef.shastore.model.components.RegularFile;
 import com.example.yosef.shastore.model.connectors.ByteCrypto;
+import com.example.yosef.shastore.model.connectors.DeviceTableManager;
+import com.example.yosef.shastore.model.connectors.FileTableManager;
 import com.example.yosef.shastore.model.connectors.ProfileManager;
 import com.example.yosef.shastore.model.util.InternalStorageHandler;
 import com.example.yosef.shastore.model.util.SharedPreferenceHandler;
@@ -69,13 +71,14 @@ public class MainActivity extends AppCompatActivity {
     private static String TAG = MainActivity.class.getSimpleName();
 
     private static final int CREATE_REQUEST_CODE = 40;
-    private static final int ENCRYPT_REQUEST_CODE = 41;
-    private static final int DECRYPT_REQUEST_CODE = 42;
+    private static final int ENCRYPT_REQUEST_CODE = -1;
+    private static final int DECRYPT_REQUEST_CODE = -1;
     private static final int REGISTER_DEVICE = 50;
+    private static final int CHOOSE_FILE = 41;
 
-    private static EditText plainFileName;
-    private static EditText secureFileName;
+    private static EditText fileName;
     private static SecretKey savedKey;
+    private Uri currentUri;
     private RegularFile plainFile = new RegularFile();
     private EncryptedFile secureFile = new EncryptedFile();
     private String action = "null";
@@ -190,58 +193,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onStart()
     {
         super.onStart();
-        plainFileName = findViewById(R.id.plainFileName);
-        secureFileName = findViewById(R.id.secureFileName);
-    }
-    public void newFile(View view)
-    {
-        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
-
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        //intent.setType("text/plain");
-        intent.setType("*/*");
-        intent.putExtra(Intent.EXTRA_TITLE, "newfile.txt");
-
-        startActivityForResult(intent, CREATE_REQUEST_CODE);
-    }
-
-    private void writeFileContent(Uri uri)
-    {
-        try{
-            ParcelFileDescriptor pfd =
-                    this.getContentResolver().
-                            openFileDescriptor(uri, "w");
-
-            FileOutputStream fileOutputStream =
-                    new FileOutputStream(pfd.getFileDescriptor());
-
-            String textContent =
-                    plainFileName.getText().toString();
-
-            fileOutputStream.write(textContent.getBytes());
-
-            fileOutputStream.close();
-            pfd.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    private String readFileContent(Uri uri) throws IOException {
-
-        InputStream inputStream =
-                getContentResolver().openInputStream(uri);
-        BufferedReader reader =
-                new BufferedReader(new InputStreamReader(
-                        inputStream));
-        StringBuilder stringBuilder = new StringBuilder();
-        String currentline;
-        while ((currentline = reader.readLine()) != null) {
-            stringBuilder.append(currentline + "\n");
-        }
-        inputStream.close();
-        return stringBuilder.toString();
+        fileName = findViewById(R.id.fileName);
     }
 
     private void readFileFromUri(Uri uri, FileObject newFile) throws IOException{
@@ -262,13 +214,40 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
+    private String getFileNameFromUri(Uri uri){
+        Cursor cursor = getContentResolver()
+                .query(uri, null, null, null, null, null);
+        try {
+            if (cursor != null && cursor.moveToFirst()) {
+                String displayName = cursor.getString(
+                        cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
+                Log.i(TAG, "Display Name: " + displayName);
+                return displayName;
+            }
+        } finally {
+            cursor.close();
+        }
+        return "";
+    }
+
     private void doEncryption(FileObject plainFile, Uri secureUri)  {
         try{
-            KeyGenerator keygen = KeyGenerator.getInstance("AES");
-            keygen.init(256);
-            savedKey = keygen.generateKey();
+            SecretKey nowKey = ByteCrypto.generateRandKey();
+
             secureFile = new EncryptedFile();
-            byte[] cipherText = ByteCrypto.encryptByte(plainFile.getContent(), savedKey);
+            byte[] cipherText = ByteCrypto.encryptByte(plainFile.getContent(), nowKey);
+            secureFile.setContent(cipherText);
+            secureFile.setFileKey(nowKey);
+            secureFile.setFileId(EncryptedFile.generateFileId(ShastoreApplication.instanceId));
+            SecretKey deviceKey = new DeviceTableManager().getKey(ShastoreApplication.instanceId);
+            //Log.i("!!!!!!!!", ByteCrypto.key2Str(deviceKey));
+
+            byte[] cipherKey = ByteCrypto.encryptByte(nowKey.getEncoded(), deviceKey);
+            secureFile.setCipherKey(cipherKey);
+            new FileTableManager().saveFile(secureFile);
+
+            // add head
+
             ParcelFileDescriptor pfd =
                     this.getContentResolver().
                             openFileDescriptor(secureUri, "w");
@@ -276,24 +255,24 @@ public class MainActivity extends AppCompatActivity {
             FileOutputStream fileOutputStream =
                     new FileOutputStream(pfd.getFileDescriptor());
 
-            secureFile.setContent(cipherText);
+
             secureFile.writeContent(fileOutputStream);
             pfd.close();
-            Log.d(TAG, "Saving encrypted file" );
-        } catch (NoSuchAlgorithmException e){
-
+            Toast.makeText(this, "Saved encrypted file to cloud", Toast.LENGTH_LONG).show();
         } catch (IOException e) {
             Log.e(TAG, "Cannot open file " + secureUri.toString());
         }
 
     }
 
-    private void doDecryption(FileObject secureFile, Uri plainUri){
+    private void doDecryption(EncryptedFile secureFile, Uri plainUri){
         try{
 //            DocumentsContract.deleteDocument(getContentResolver(), plainUri);
 //            return;
+
             plainFile = new RegularFile();
-            byte[] plainText = ByteCrypto.decryptByte(secureFile.getContent(), savedKey);
+
+            byte[] plainText = ByteCrypto.decryptByte(secureFile.getContent(), secureFile.getFileKey());
             ParcelFileDescriptor pfd = this.getContentResolver().
                             openFileDescriptor(plainUri, "w");
 
@@ -311,36 +290,13 @@ public class MainActivity extends AppCompatActivity {
     public void onActivityResult(int requestCode, int resultCode,
                                  Intent resultData) {
 
-        Uri currentUri = null;
 
         if (resultCode == Activity.RESULT_OK)
         {
-            if (requestCode == ENCRYPT_REQUEST_CODE)
-            {
+            if (requestCode == CHOOSE_FILE) {
                 if (resultData != null) {
                     currentUri = resultData.getData();
-                    try {
-                        readFileFromUri(currentUri, plainFile);
-                        plainFileName.setText(plainFile.getName());
-                        action = "enc";
-                    } catch (Exception e) {
-                        // Handle error here
-                    }
-                }
-            }
-            if (requestCode == DECRYPT_REQUEST_CODE)
-            {
-                if (resultData != null) {
-                    currentUri = resultData.getData();
-                    try {
-                        readFileFromUri(currentUri, secureFile);
-                        secureFileName.setText(secureFile.getName());
-                        action = "dec";
-                        //Toast.makeText(this, new String(secureFile.getContent()), Toast.LENGTH_LONG).show();
-                        Log.i(TAG, "Open secure file !!!!!! " + new String(secureFile.getContent()));
-                    } catch (Exception e) {
-                        // Handle error here
-                    }
+                    fileName.setText(getFileNameFromUri(currentUri));
                 }
             }
             if (requestCode == CREATE_REQUEST_CODE)
@@ -407,30 +363,49 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-    public void decryptFile(View view)
-    {
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        //intent.setType("text/plain");
-        intent.setType("*/*");
-        intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-        startActivityForResult(intent, DECRYPT_REQUEST_CODE);
-    }
-
-    public void encryptFile(View view)
-    {
-        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-        intent.setType("*/*");
-        startActivityForResult(intent, ENCRYPT_REQUEST_CODE);
-    }
-
-    public void saveFile(View view){
+    public void saveFile(){
         Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
         intent.setType("text/plain");
         startActivityForResult(intent, CREATE_REQUEST_CODE);
+    }
+    public void chooseFile(View view){
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        //intent.setType("text/plain");
+        intent.setType("*/*");
+        intent.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
+        startActivityForResult(intent, CHOOSE_FILE);
+    }
+
+    public void encryptFile(View view){
+        try{
+            readFileFromUri(currentUri, plainFile);
+            action = "enc";
+            saveFile();
+        } catch (IOException e){
+            Log.e(TAG, "File IO Exception");
+        }
+    }
+
+    public void decryptFile(View view){
+        try{
+            readFileFromUri(currentUri, secureFile);
+            action = "dec";
+            secureFile.setFileKey(new FileTableManager().getFileKey(secureFile.getFileId()));
+            if (secureFile.getFileKey() != null){
+                saveFile();
+            }else{
+                //TODO: @Yosef you shuold implement device B code here;
+                // Here you can use the secureFile to access the encrypted file user chose.
+                // In the secureFile the fileId is the id of the file, and the cipherKey is the fileKey after encryption.
+                // the fileId is (DeviceId+T+Time) in Base64String. So the last character of fileId maybe random.
+
+            }
+
+        } catch (IOException e){
+            Log.e(TAG, "File IO Exception");
+        }
     }
 }
