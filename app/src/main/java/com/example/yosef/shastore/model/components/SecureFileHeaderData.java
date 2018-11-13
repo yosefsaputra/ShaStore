@@ -38,21 +38,21 @@ public class SecureFileHeaderData implements Parcelable {
             return new SecureFileHeaderData[size];
         }
     };
-    private String header;
+    private String fileId;
 
     protected SecureFileHeaderData(Parcel in) {
     }
 
-    public SecureFileHeaderData(String header) {
-        this.header = header;
+    public SecureFileHeaderData(String fileId) {
+        this.fileId = fileId;
     }
 
-    public String getHeader() {
-        return header;
+    public String getFileId() {
+        return fileId;
     }
 
-    public void setHeader(String header) {
-        this.header = header;
+    public void setFileId(String fileId) {
+        this.fileId = fileId;
     }
 
     @Override
@@ -67,20 +67,20 @@ public class SecureFileHeaderData implements Parcelable {
     @Override
     public String toString() {
         return "SecureFileHeaderData{" +
-                "header='" + header + '\'' +
+                "fileId='" + fileId + '\'' +
                 '}';
     }
 
     public String toQRCodeString() {
-        return String.format("fh: %s", header);
+        return String.format("fid: %s", fileId);
     }
 
     public boolean toSecureFileHeaderData(String rawValue) {
-        Pattern pattern = Pattern.compile("(fh:)([^\\s]*)(\\s*)(.*)");
+        Pattern pattern = Pattern.compile("(fid:)([^\\s]*)(\\s*)(.*)");
         Matcher matcher = pattern.matcher(rawValue);
 
         if (matcher.matches()) {
-            header = matcher.group(2);
+            fileId = matcher.group(2);
             return true;
         } else {
             return false;
