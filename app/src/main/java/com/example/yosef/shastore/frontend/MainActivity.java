@@ -69,6 +69,8 @@ public class MainActivity extends AppCompatActivity {
     private static final int DECRYPT_REQUEST_CODE = -1;
     private static final int REGISTER_DEVICE = 50;
     private static final int CHOOSE_FILE = 41;
+    private static final int GET_FILE_KEY = 42;
+
 
     private static EditText fileName;
     private static SecretKey savedKey;
@@ -339,6 +341,10 @@ public class MainActivity extends AppCompatActivity {
                 }
                 Toast.makeText(this, toast, Toast.LENGTH_LONG).show();
             }
+
+            if (requestCode == GET_FILE_KEY) {
+                // TODO: implement
+            }
         }
     }
     public void saveFile(){
@@ -380,6 +386,22 @@ public class MainActivity extends AppCompatActivity {
                 // In the secureFile the fileId is the id of the file, and the cipherKey is the fileKey after encryption.
                 // the fileId is (DeviceId+T+Time) in Base64String. So the last character of fileId maybe random.
 
+                String deviceId = EncryptedFile.getDeviceId(secureFile.getFileId());
+                if (deviceId != null) {
+                    Toast.makeText(this, "Invalid ShaStore File", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                if ((AppDatabase.getDatabase().deviceDbDao().getDeviceById(deviceId) != null)) {
+                    // TODO : implement
+
+                } else {
+                    // Create QR Code to send file header with a button
+                    Intent intent = new Intent(this, SecureFileHeaderQRCodeActivity.class);
+                    intent.putExtra(SecureFileHeaderQRCodeActivity.ACTION_INTENT_EXTRA, "GET_FILE_KEY");
+                    intent.putExtra(SecureFileHeaderQRCodeActivity.FILE_ID_INTENT_EXTRA, secureFile.getFileId());
+                    startActivityForResult(intent, GET_FILE_KEY);
+                }
             }
 
         } catch (IOException e){
