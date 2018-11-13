@@ -312,21 +312,7 @@ public class MainActivity extends AppCompatActivity {
             if (requestCode == REGISTER_DEVICE) {
                 DeviceRegistrationData deviceRegistrationData = resultData.getParcelableExtra(RegistrationCameraActivity.DEVICE_REGISTRATION_DATA);
 
-//                String passwordHash;
-//                String newUUID;
-//                String newDeviceKey;
-
                 boolean registered = false;
-
-//                // parse barcode data
-//                Pattern pattern = Pattern.compile("(p:)([^\\s]*)(\\s+)(id:)([^\\s]*)(\\s+)(k:)([^\\s]*)(\\s*)(.*)");
-//                Matcher matcher = pattern.matcher(barcode.rawValue);
-//
-//                if (matcher.matches()) {
-//                    passwordHash = matcher.group(2);
-//                    newUUID = matcher.group(5);
-//                    newDeviceKey = matcher.group(8);
-
 
                 // create a new device
                 Device newDevice = null;
@@ -388,7 +374,7 @@ public class MainActivity extends AppCompatActivity {
             secureFile.setFileKey(new FileTableManager().getFileKey(secureFile.getFileId()));
             if (secureFile.getFileKey() != null){
                 saveFile();
-            }else{
+            } else {
                 //TODO: @Yosef you shuold implement device B code here;
                 // Here you can use the secureFile to access the encrypted file user chose.
                 // In the secureFile the fileId is the id of the file, and the cipherKey is the fileKey after encryption.
