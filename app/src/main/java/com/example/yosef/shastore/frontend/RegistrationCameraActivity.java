@@ -290,7 +290,6 @@ public class RegistrationCameraActivity extends AppCompatActivity implements Bar
 
         if (best != null) {
             Intent intent = new Intent();
-
             if (best.rawValue.startsWith("a:" + DeviceRegistrationData.TAG)) {
                 DeviceRegistrationData data = new DeviceRegistrationData();
                 data.toDeviceRegistrationData(best.rawValue);
