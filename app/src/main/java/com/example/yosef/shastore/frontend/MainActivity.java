@@ -395,6 +395,7 @@ public class MainActivity extends AppCompatActivity {
                 if ((AppDatabase.getDatabase().deviceDbDao().getDeviceById(deviceId) != null)) {
                     // TODO : implement
 
+
                 } else {
                     // Create QR Code to send file header with a button
                     Intent intent = new Intent(this, SecureFileHeaderQRCodeActivity.class);
