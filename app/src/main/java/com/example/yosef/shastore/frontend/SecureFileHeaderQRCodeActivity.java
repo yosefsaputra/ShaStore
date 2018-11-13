@@ -23,6 +23,7 @@ package com.example.yosef.shastore.frontend;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -31,8 +32,9 @@ import com.example.yosef.shastore.model.components.QRCodeFactory;
 import com.example.yosef.shastore.model.components.SecureFileHeaderData;
 
 public class SecureFileHeaderQRCodeActivity extends AppCompatActivity {
+    private static final String TAG = SecureFileHeaderQRCodeActivity.class.getSimpleName();
     public static String ACTION_INTENT_EXTRA = "ACTION_INTENT_EXTRA";
-    public static String SECURE_FILE_HEADER_INTENT_EXTRA = "SECURE_FILE_HEADER_INTENT_EXTRA";
+    public static String FILE_ID_INTENT_EXTRA = "FILE_ID_HEADER_INTENT_EXTRA";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,9 +43,12 @@ public class SecureFileHeaderQRCodeActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         String action = intent.getStringExtra(ACTION_INTENT_EXTRA);
-        String secureFileHeader = intent.getStringExtra(SECURE_FILE_HEADER_INTENT_EXTRA);
+        String secureFileHeader = intent.getStringExtra(FILE_ID_INTENT_EXTRA);
 
-        if (action == null || secureFileHeader == null) {
+        Log.d(TAG, "action: " + action);
+        Log.d(TAG, "secureFileHeader: " + secureFileHeader);
+
+        if (!action.equals("GET_FILE_KEY") || secureFileHeader == null) {
             Toast.makeText(this, "Invalid QR code", Toast.LENGTH_LONG).show();
             finish();
         } else {
