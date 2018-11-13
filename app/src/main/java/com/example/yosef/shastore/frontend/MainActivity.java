@@ -135,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
                     case R.id.debug_reset_database: {
                         AppDatabase.getDatabase().resetDatabase();
                         InternalStorageHandler.deleteFile(getApplicationContext(), ShastoreApplication.FILE_NAME_INSTANCE_ID);
+                        getApplication().onCreate();
                     }
                     case R.id.menu_sign_out: {
                         SharedPreferenceHandler.getSharedPrefsEditorCurrentUserSettings(getApplicationContext()).putString(SharedPreferenceHandler.SHARED_PREFS_CURRENT_PROFILE_USERNAME, null).apply();
