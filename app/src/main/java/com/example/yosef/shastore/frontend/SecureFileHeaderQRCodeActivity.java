@@ -23,39 +23,38 @@ package com.example.yosef.shastore.frontend;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.yosef.shastore.R;
-import com.example.yosef.shastore.model.components.DeviceRegistrationData;
 import com.example.yosef.shastore.model.components.QRCodeFactory;
+import com.example.yosef.shastore.model.components.SecureFileHeaderData;
 
-public class DeviceRegistrationQRCodeActivity extends AppCompatActivity {
+public class SecureFileHeaderQRCodeActivity extends AppCompatActivity {
+    private static final String TAG = SecureFileHeaderQRCodeActivity.class.getSimpleName();
     public static String ACTION_INTENT_EXTRA = "ACTION_INTENT_EXTRA";
-    public static String PASSWORD_HASH_INTENT_EXTRA = "PASSWORD_HASH_INTENT_EXTRA";
-    public static String DEVICE_UNIQUE_ID_INTENT_EXTRA = "DEVICE_UNIQUE_ID_INTENT_EXTRA";
-    public static String DEVICE_KEY_INTENT_EXTRA = "DEVICE_KEY_INTENT_EXTRA";
+    public static String FILE_ID_INTENT_EXTRA = "FILE_ID_HEADER_INTENT_EXTRA";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_registration_camera);
+        setContentView(R.layout.activity_secure_file_header_qrcode);
 
         Intent intent = getIntent();
-        String passwordHash = intent.getStringExtra(PASSWORD_HASH_INTENT_EXTRA);
-        String deviceUniqueId = intent.getStringExtra(DEVICE_UNIQUE_ID_INTENT_EXTRA);
-        String deviceKey = intent.getStringExtra(DEVICE_KEY_INTENT_EXTRA);
+        String action = intent.getStringExtra(ACTION_INTENT_EXTRA);
+        String secureFileHeader = intent.getStringExtra(FILE_ID_INTENT_EXTRA);
 
-        if (passwordHash == null || deviceUniqueId == null || deviceKey == null) {
+        Log.d(TAG, "action: " + action);
+        Log.d(TAG, "secureFileHeader: " + secureFileHeader);
+
+        if (!action.equals("GET_FILE_KEY") || secureFileHeader == null) {
             Toast.makeText(this, "Invalid QR code", Toast.LENGTH_LONG).show();
             finish();
         } else {
-            ImageView qrcode_imageview = findViewById(R.id.qrcode_imageview);
+            ImageView qrcode_imageview = findViewById(R.id.securefileheaderqrcode_imageview);
 
-            DeviceRegistrationData data = new DeviceRegistrationData();
-            data.setPasswordHash(passwordHash);
-            data.setDeviceUniqueId(deviceUniqueId);
-            data.setDeviceKey(deviceKey);
+            SecureFileHeaderData data = new SecureFileHeaderData(secureFileHeader);
 
             QRCodeFactory qrCodeFactory = new QRCodeFactory();
 

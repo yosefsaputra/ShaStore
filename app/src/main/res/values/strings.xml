@@ -51,4 +51,6 @@
     <string name="menu_sign_out">Sign Out</string>
     <string name="debug_reset_database">Reset Database</string>
     <string name="debug_print_database">Print Database</string>
+    <string name="fileheaderselect_button_text">Choose File</string>
+    <string name="secureFileHeaderQRCode_note">Scan this QRCode with your master device and proceed to select the .txte file</string>
 </resources>
