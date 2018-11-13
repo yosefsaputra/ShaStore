@@ -69,7 +69,7 @@ public class MainActivity extends AppCompatActivity {
     private static final int DECRYPT_REQUEST_CODE = -1;
     private static final int REGISTER_DEVICE = 50;
     private static final int CHOOSE_FILE = 41;
-    private static final int GET_FILE_KEY = 42;
+    private static final int GET_FILE_HEADER = 42;
 
 
     private static EditText fileName;
@@ -205,7 +205,6 @@ public class MainActivity extends AppCompatActivity {
         }
         InputStream inputStream = getContentResolver().openInputStream(uri);
         newFile.readContent(inputStream);
-
     }
 
     private String getFileNameFromUri(Uri uri){
@@ -312,7 +311,7 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
             if (requestCode == REGISTER_DEVICE) {
-                DeviceRegistrationData deviceRegistrationData = resultData.getParcelableExtra(RegistrationCameraActivity.DEVICE_REGISTRATION_DATA);
+                DeviceRegistrationData deviceRegistrationData = resultData.getParcelableExtra(RegistrationCameraActivity.DATA);
 
                 boolean registered = false;
 
@@ -342,8 +341,12 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, toast, Toast.LENGTH_LONG).show();
             }
 
-            if (requestCode == GET_FILE_KEY) {
+            if (requestCode == GET_FILE_HEADER) {
+                Log.i(TAG, ByteCrypto.byte2Str(resultData.getByteArrayExtra(SecureFileHeaderQRCodeActivity.FILE_HEADER_RETURN_INTENT_EXTRA)));
                 // TODO: implement
+                // 1. Decrypt the file header with current device key
+                // 2. Get the fileKey
+                // 3. Put the filekey to the database
             }
         }
     }
@@ -384,7 +387,9 @@ public class MainActivity extends AppCompatActivity {
                 //TODO: @Yosef you shuold implement device B code here;
                 // Here you can use the secureFile to access the encrypted file user chose.
                 // In the secureFile the fileId is the id of the file, and the cipherKey is the fileKey after encryption.
-                // the fileId is (DeviceId+T+Time) in Base64String. So the last character of fileId maybe random.
+                // the fileId is (DeviceId+#T#+Time) in Base64String. So the last character of fileId maybe random.
+
+                Log.i(TAG, "File ID: " + secureFile.getFileId());
 
                 String deviceId = EncryptedFile.getDeviceId(secureFile.getFileId());
                 if (deviceId == null) {
@@ -392,15 +397,20 @@ public class MainActivity extends AppCompatActivity {
                     return;
                 }
 
+                Log.i(TAG, "Device ID: " + deviceId);
                 if ((AppDatabase.getDatabase().deviceDbDao().getDeviceById(deviceId) != null)) {
                     // TODO : implement
-
+                    // 1. Get the device key from database based on device id
+                    // 2. Decrypt file header with device key
+                    // 3. Get the fileKey
+                    // 4. saveFile()
                 } else {
                     // Create QR Code to send file header with a button
                     Intent intent = new Intent(this, SecureFileHeaderQRCodeActivity.class);
-                    intent.putExtra(SecureFileHeaderQRCodeActivity.ACTION_INTENT_EXTRA, "GET_FILE_KEY");
+                    intent.putExtra(SecureFileHeaderQRCodeActivity.ACTION_INTENT_EXTRA, "GET_FILE_HEADER");
                     intent.putExtra(SecureFileHeaderQRCodeActivity.FILE_ID_INTENT_EXTRA, secureFile.getFileId());
-                    startActivityForResult(intent, GET_FILE_KEY);
+                    intent.putExtra(SecureFileHeaderQRCodeActivity.FILE_CIPHER_KEY_INTENT_EXTRA, secureFile.getCipherKey());
+                    startActivityForResult(intent, GET_FILE_HEADER);
                 }
             }
 

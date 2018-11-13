@@ -48,6 +48,7 @@ import com.example.yosef.shastore.frontend.camera.CameraSource;
 import com.example.yosef.shastore.frontend.camera.CameraSourcePreview;
 import com.example.yosef.shastore.frontend.camera.GraphicOverlay;
 import com.example.yosef.shastore.model.components.DeviceRegistrationData;
+import com.example.yosef.shastore.model.components.SecureFileHeaderData;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.vision.MultiProcessor;
@@ -60,7 +61,7 @@ public class RegistrationCameraActivity extends AppCompatActivity implements Bar
     private static final String TAG = RegistrationCameraActivity.class.getSimpleName();
 
     // public static final String BarcodeObject = "Barcode";
-    public static final String DEVICE_REGISTRATION_DATA = "DEVICE_REGISTRATION_DATA";
+    public static final String DATA = "DATA";
     // intent request code to handle updating play services if needed.
     private static final int RC_HANDLE_GMS = 9001;
     // permission request codes need to be < 256
@@ -289,12 +290,16 @@ public class RegistrationCameraActivity extends AppCompatActivity implements Bar
 
         if (best != null) {
             Intent intent = new Intent();
-            // data.putExtra(BarcodeObject, best);
 
-            DeviceRegistrationData data = new DeviceRegistrationData();
-            data.toDeviceRegistrationData(best.rawValue);
-
-            intent.putExtra(DEVICE_REGISTRATION_DATA, data);
+            if (best.rawValue.startsWith("a:" + DeviceRegistrationData.TAG)) {
+                DeviceRegistrationData data = new DeviceRegistrationData();
+                data.toDeviceRegistrationData(best.rawValue);
+                intent.putExtra(DATA, data);
+            } else if (best.rawValue.startsWith("a:" + SecureFileHeaderData.TAG)) {
+                SecureFileHeaderData data = new SecureFileHeaderData();
+                data.toSecureFileHeaderData(best.rawValue);
+                intent.putExtra(DATA, data);
+            }
             setResult(Activity.RESULT_OK, intent);
             finish();
             return true;
