@@ -60,6 +60,7 @@ import com.example.yosef.shastore.setup.ShastoreApplication;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 import javax.crypto.SecretKey;
 
@@ -276,7 +277,8 @@ public class MainActivity extends AppCompatActivity {
 
             SecretKey deviceKey = ByteCrypto.str2Key(device.getKey());
             byte[] fileKey = ByteCrypto.decryptByte(ByteCrypto.str2Byte(secureFileHeaderData.getCipherKey()), deviceKey);
-            Device requestDevice = AppDatabase.getDatabase().getDevicebyId(EncryptedFile.getDeviceId(secureFileHeaderData.getFileId()));
+//            Device requestDevice = AppDatabase.getDatabase().getDevicebyId(EncryptedFile.getDeviceId(secureFileHeaderData.getFileId()));
+            Device requestDevice = AppDatabase.getDatabase().getDevicebyId(secureFileHeaderData.getRequestDeviceId());
 
             if (requestDevice == null) {
                 Toast.makeText(this, "Unregistered Request Device", Toast.LENGTH_LONG).show();
@@ -284,11 +286,14 @@ public class MainActivity extends AppCompatActivity {
             }
             SecretKey requestDeviceKey = ByteCrypto.str2Key(requestDevice.getKey());
             byte[] encryptedFileKey = ByteCrypto.encryptByte(fileKey, requestDeviceKey);
+            Log.i(TAG, "Request Device Key : " + ByteCrypto.key2Str(requestDeviceKey));
+            Log.i(TAG, "Encrypted File Key : " + Arrays.toString(encryptedFileKey));
+            Log.i(TAG, "File Key : " + ByteCrypto.key2Str(ByteCrypto.byte2key(ByteCrypto.decryptByte(encryptedFileKey, requestDeviceKey))));
             String fileId = secureFileHeaderData.getFileId();
 
             encryptedFile.setFileId(fileId);
             encryptedFile.setCipherKey(encryptedFileKey);
-            encryptedFile.setContent(new byte[]{});
+            encryptedFile.setContent("Hello world".getBytes());
 
 //            byte[] content = new byte[fileId.length + encryptedFileKey.length];
 //            System.arraycopy(fileId, 0, content, 0, fileId.length);
@@ -413,7 +418,6 @@ public class MainActivity extends AppCompatActivity {
             }
 
             if (requestCode == GET_FILE_HEADER) {
-                doDecryptSecureHeader(resultData.getByteArrayExtra(SecureFileHeaderQRCodeActivity.FILE_HEADER_RETURN_INTENT_EXTRA));
             }
         }
     }
