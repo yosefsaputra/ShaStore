@@ -25,6 +25,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.DocumentsContract;
 import android.provider.OpenableColumns;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -91,8 +92,7 @@ public class SecureFileHeaderQRCodeActivity extends AppCompatActivity {
                     EncryptedFile txte = new EncryptedFile();
                     try {
                         readFileFromUri(resultData.getData(), txte);
-                        // TODO: add back
-                        // DocumentsContract.deleteDocument(getContentResolver(), resultData.getData());
+                        DocumentsContract.deleteDocument(getContentResolver(), resultData.getData());
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -106,7 +106,7 @@ public class SecureFileHeaderQRCodeActivity extends AppCompatActivity {
                     }
 
                     Log.i(TAG, Arrays.toString(txte.getCipherKey()));
-                    Log.i(TAG, txte.getFileId());
+                    Log.i(TAG, txte.getFileId() + "!!!");
 
                     byte[] fileKey = ByteCrypto.decryptByte(txte.getCipherKey(), ByteCrypto.str2Key(device.getKey()));
                     txte.setFileKey(ByteCrypto.byte2key(fileKey));
