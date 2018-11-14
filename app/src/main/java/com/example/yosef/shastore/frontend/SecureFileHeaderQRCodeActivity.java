@@ -25,7 +25,6 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.DocumentsContract;
 import android.provider.OpenableColumns;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -39,13 +38,13 @@ import com.example.yosef.shastore.model.components.Device;
 import com.example.yosef.shastore.model.components.EncryptedFile;
 import com.example.yosef.shastore.model.components.FileObject;
 import com.example.yosef.shastore.model.components.QRCodeFactory;
-import com.example.yosef.shastore.model.components.RegularFile;
 import com.example.yosef.shastore.model.components.SecureFileHeaderData;
 import com.example.yosef.shastore.model.connectors.ByteCrypto;
 import com.example.yosef.shastore.setup.ShastoreApplication;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Arrays;
 
 public class SecureFileHeaderQRCodeActivity extends AppCompatActivity {
     private static final String TAG = SecureFileHeaderQRCodeActivity.class.getSimpleName();
@@ -92,7 +91,8 @@ public class SecureFileHeaderQRCodeActivity extends AppCompatActivity {
                     EncryptedFile txte = new EncryptedFile();
                     try {
                         readFileFromUri(resultData.getData(), txte);
-                        DocumentsContract.deleteDocument(getContentResolver(), resultData.getData());
+                        // TODO: add back
+                        // DocumentsContract.deleteDocument(getContentResolver(), resultData.getData());
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -105,8 +105,12 @@ public class SecureFileHeaderQRCodeActivity extends AppCompatActivity {
                         return;
                     }
 
+                    Log.i(TAG, Arrays.toString(txte.getCipherKey()));
+                    Log.i(TAG, txte.getFileId());
+
                     byte[] fileKey = ByteCrypto.decryptByte(txte.getCipherKey(), ByteCrypto.str2Key(device.getKey()));
                     txte.setFileKey(ByteCrypto.byte2key(fileKey));
+                    Log.i(TAG, ByteCrypto.key2Str(txte.getFileKey()));
                     AppDatabase.getDatabase().addEncFile(txte);
                     Toast.makeText(this,"Saved file key to database", Toast.LENGTH_LONG).show();
 //                    Intent intent = new Intent();
