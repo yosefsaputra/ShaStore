@@ -97,10 +97,25 @@
             android:layout_margin="16dp"
             android:layout_marginEnd="8dp"
             android:layout_marginBottom="8dp"
-            android:src="@android:drawable/ic_input_add"
             android:onClick="openRegistrationCameraActivity"
+            android:src="@android:drawable/ic_menu_camera"
+            app:backgroundTint="@color/primary"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent" />
+
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/register_fab2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+            android:layout_margin="16dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginBottom="104dp"
+            android:onClick="openRegistrationCameraActivity"
+            android:src="@drawable/ic_qrcode_scan"
+            app:backgroundTint="@color/icons"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
 
     </android.support.constraint.ConstraintLayout>
 
