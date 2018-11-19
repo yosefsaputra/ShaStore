@@ -85,6 +85,13 @@ public class MainActivity extends AppCompatActivity {
     private ConstraintLayout layout;
     private DrawerLayout drawerLayout;
 
+
+
+    ////////////////////////////////For timing
+
+    long keyTime;
+
+    /////////////////////////
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -228,6 +235,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void doEncryption(FileObject plainFile, Uri secureUri)  {
         try{
+            long encStart = System.currentTimeMillis();
+
             SecretKey nowKey = ByteCrypto.generateRandKey();
 
             secureFile = new EncryptedFile();
@@ -242,6 +251,8 @@ public class MainActivity extends AppCompatActivity {
             secureFile.setCipherKey(cipherKey);
             new FileTableManager().saveFile(secureFile);
 
+            long encFinish = System.currentTimeMillis();
+            Log.i(TAG, "!!!! Enc takes time = " + (encFinish - encStart));
             // add head
 
             ParcelFileDescriptor pfd =
@@ -254,6 +265,8 @@ public class MainActivity extends AppCompatActivity {
 
             secureFile.writeContent(fileOutputStream);
             pfd.close();
+            long encWrite = System.currentTimeMillis();
+            Log.i(TAG, "!!!! write enc file takes time = " + (encWrite - encFinish));
             Toast.makeText(this, "Saved encrypted file to cloud", Toast.LENGTH_LONG).show();
         } catch (IOException e) {
             Log.e(TAG, "Cannot open file " + secureUri.toString());
@@ -314,10 +327,14 @@ public class MainActivity extends AppCompatActivity {
         try{
 //            DocumentsContract.deleteDocument(getContentResolver(), plainUri);
 //            return;
-
+            long decStart = System.currentTimeMillis();
             plainFile = new RegularFile();
 
             byte[] plainText = ByteCrypto.decryptByte(secureFile.getContent(), secureFile.getFileKey());
+            long decFinish = System.currentTimeMillis();
+
+            Log.i(TAG, "!!!!! dec takes time = " + (decFinish - decStart + keyTime));
+
             ParcelFileDescriptor pfd = this.getContentResolver().
                             openFileDescriptor(plainUri, "w");
 
@@ -326,6 +343,8 @@ public class MainActivity extends AppCompatActivity {
             plainFile.setContent(plainText);
             plainFile.writeContent(fileOutputStream);
             pfd.close();
+            long decWrite = System.currentTimeMillis();
+            Log.i(TAG, "!!!!! dec write file takes time = " + (decWrite - decFinish));
             Log.d(TAG,"Saving plain file ");
             Toast.makeText(this, "Saved plain file to local storage", Toast.LENGTH_LONG).show();
         } catch (IOException e) {
@@ -452,7 +471,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void encryptFile(View view){
         try{
+            long start = System.currentTimeMillis();
+            Log.i(TAG, "!!!! Start timing at = " + start);
             readFileFromUri(currentUri, plainFile);
+            long readFinish = System.currentTimeMillis();
+            Log.i(TAG, "!!!! Read finish takes = " + (readFinish - start));
             action = "enc";
             saveFile();
         } catch (IOException e){
@@ -462,10 +485,14 @@ public class MainActivity extends AppCompatActivity {
 
     public void decryptFile(View view){
         try{
+            long readStart = System.currentTimeMillis();
             readFileFromUri(currentUri, secureFile);
+            keyTime = System.currentTimeMillis();
+            Log.i(TAG, "!!!!! dec read file takes = " + (keyTime - readStart));
             action = "dec";
             secureFile.setFileKey(new FileTableManager().getFileKey(secureFile.getFileId()));
             if (secureFile.getFileKey() != null){
+                keyTime = System.currentTimeMillis() - keyTime;
                 saveFile();
             } else {
                 //TODO: @Yosef you shuold implement device B code here;
@@ -491,6 +518,7 @@ public class MainActivity extends AppCompatActivity {
                     // 4. saveFile()
                     SecretKey deviceKey = ByteCrypto.str2Key(thisDevice.getKey());
                     secureFile.setFileKey(ByteCrypto.byte2key(ByteCrypto.decryptByte(secureFile.getCipherKey(), deviceKey)));
+                    keyTime = System.currentTimeMillis() - keyTime;
                     saveFile();
                 } else {
                     // Create QR Code to send file header with a button
